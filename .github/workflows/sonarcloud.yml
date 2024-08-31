@@ -28,10 +28,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('portfolio-backend/**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        working-directory: portfolio-backend  # Set the working directory
         run: ./gradlew build sonar --info
