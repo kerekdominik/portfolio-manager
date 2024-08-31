@@ -2,10 +2,19 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.3.3"
 	id("io.spring.dependency-management") version "1.1.6"
+	id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "com.portfolio"
 version = "0.0.1-SNAPSHOT"
+
+sonar {
+	properties {
+		property("sonar.projectKey", "kerekdominik_portfolio-manager")
+		property("sonar.organization", "kerekdominik")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
+}
 
 java {
 	toolchain {
