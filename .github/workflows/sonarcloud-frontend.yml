@@ -36,6 +36,7 @@ jobs:
           args: >
             -Dsonar.projectKey=portfolio-frontend
             -Dsonar.organization=kerekdominik
+            -Dsonar.exclusions=portfolio-backend/**,**/node_modules/**,**/*.java
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
