@@ -22,8 +22,13 @@ jobs:
         with:
           node-version: '14'
 
+      # Change to the frontend subdirectory for all following commands
+      - name: Set working directory
+        run: cd portfolio-frontend
+        
       - name: Install dependencies
         run: npm install
+        working-directory: portfolio-frontend
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
