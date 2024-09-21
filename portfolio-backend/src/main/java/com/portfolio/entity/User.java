@@ -1,6 +1,7 @@
 package com.portfolio.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class User {
+    @Id
     private long id;
     private String username;
     private String password;
@@ -21,6 +23,10 @@ public class User {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public User() {
+
     }
 }
 

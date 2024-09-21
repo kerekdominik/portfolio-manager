@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.portfolio"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
 
 sonar {
 	properties {
@@ -36,6 +36,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
