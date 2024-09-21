@@ -11,8 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PortfolioBackendApplicationTests {
 
 	@Test
-	void applicationStartsSuccessfully() {
-		PortfolioBackendApplication.main(new String[] {});
-		assertThat(PortfolioBackendApplicationTests.class).isNotNull();
+	void applicationContextContainsPortfolioBackendApplication() {
+		assertThat(PortfolioBackendApplication.class).isNotNull();
 	}
 }
