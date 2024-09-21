@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(name = "portfolio")
 public class Portfolio {
     @Id
     private long id;
