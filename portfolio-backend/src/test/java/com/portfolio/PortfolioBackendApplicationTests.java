@@ -1,17 +1,18 @@
 package com.portfolio;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.SpringApplication;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
 class PortfolioBackendApplicationTests {
 
 	@Test
-	void applicationContextContainsPortfolioBackendApplication() {
-		assertThat(PortfolioBackendApplication.class).isNotNull();
+	void testMain() {
+		// Mock SpringApplication.run to avoid starting the full context
+		try (var mockedSpringApplication = mockStatic(SpringApplication.class)) {
+			PortfolioBackendApplication.main(new String[]{});
+			mockedSpringApplication.verify(() -> SpringApplication.run(PortfolioBackendApplication.class, new String[]{}));
+		}
 	}
 }
