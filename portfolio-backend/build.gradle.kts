@@ -3,6 +3,7 @@ plugins {
 	id("org.springframework.boot") version "3.3.3"
 	id("io.spring.dependency-management") version "1.1.6"
 	id("org.sonarqube") version "4.4.1.3373"
+	id("jacoco")
 }
 
 group = "com.portfolio"
@@ -13,6 +14,8 @@ sonar {
 		property("sonar.projectKey", "kerekdominik_portfolio-manager")
 		property("sonar.organization", "kerekdominik")
 		property("sonar.host.url", "https://sonarcloud.io")
+		property("sonar.java.coveragePlugin", "jacoco")
+		property("sonar.jacoco.reportPaths", "build/jacoco/test.exec")
 	}
 }
 
@@ -47,6 +50,22 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+
+/** Coverage and test report **/
 tasks.withType<Test> {
 	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport)
 }
+
+jacoco {
+	toolVersion = "0.8.7"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+}
+/*********************************/
