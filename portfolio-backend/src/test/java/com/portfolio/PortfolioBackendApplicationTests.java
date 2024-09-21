@@ -3,6 +3,7 @@ package com.portfolio;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 class PortfolioBackendApplicationTests {
@@ -14,5 +15,11 @@ class PortfolioBackendApplicationTests {
 			PortfolioBackendApplication.main(new String[]{});
 			mockedSpringApplication.verify(() -> SpringApplication.run(PortfolioBackendApplication.class, new String[]{}));
 		}
+	}
+
+	@Test
+	void testClassInstantiation() {
+		PortfolioBackendApplication application = new PortfolioBackendApplication();
+		assertNotNull(application);
 	}
 }
