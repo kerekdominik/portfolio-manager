@@ -20,6 +20,12 @@ public class Group {
     private Portfolio portfolio;
 
     public Group() {
-        // TODO document why this constructor is empty
+
+    }
+
+    public Group(long id, String name, Portfolio portfolio) {
+        this.id = id;
+        this.name = name;
+        this.portfolio = portfolio;
     }
 }

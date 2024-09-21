@@ -21,4 +21,17 @@ public class Cryptocurrency {
 
     @ManyToOne
     private Portfolio portfolio;
+
+    public Cryptocurrency(long id, String symbol, String name, double price, double change, Portfolio portfolio) {
+        this.id = id;
+        this.symbol = symbol;
+        this.name = name;
+        this.price = price;
+        this.change = change;
+        this.portfolio = portfolio;
+    }
+
+    public Cryptocurrency() {
+
+    }
 }
