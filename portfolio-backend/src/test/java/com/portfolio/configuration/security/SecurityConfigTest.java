@@ -1,4 +1,4 @@
-package com.portfolio.security;
+package com.portfolio.configuration.security;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
