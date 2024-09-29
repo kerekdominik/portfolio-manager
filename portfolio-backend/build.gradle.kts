@@ -35,8 +35,6 @@ repositories {
 	mavenCentral()
 }
 
-val openApiVersion: String by project
-
 dependencies {
 	platform(libs.spring.boot.bom)
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -45,8 +43,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
 	/** Imported and managed manually **/
-	implementation(libs.springdoc.openapi.ui)
-	implementation(libs.springdoc.openapi.data.rest)
+	implementation(libs.springdoc.openapi.starter.webmvc.ui)
 	/**********************************/
 
 	runtimeOnly("org.postgresql:postgresql")
