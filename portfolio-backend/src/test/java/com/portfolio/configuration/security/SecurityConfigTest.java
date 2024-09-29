@@ -22,13 +22,13 @@ class SecurityConfigTest {
 
     @Test
     void whenAccessRoot_thenOk() throws Exception {
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/api/"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void whenAccessProtectedWithoutAuth_thenRedirectsToLogin() throws Exception {
-        mockMvc.perform(get("/secured"))
+        mockMvc.perform(get("/api/secured"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
     }
@@ -36,7 +36,7 @@ class SecurityConfigTest {
     @Test
     @WithMockUser
     void whenAccessProtectedWithAuth_thenOk() throws Exception {
-        mockMvc.perform(get("/secured"))
+        mockMvc.perform(get("/api/secured"))
                 .andExpect(status().isOk());
     }
 }

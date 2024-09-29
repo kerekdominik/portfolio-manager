@@ -22,14 +22,14 @@ class AuthControllerTest {
 
     @Test
     void whenAccessHome_thenReturnHelloWorld() throws Exception {
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/api/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Hello, World!"));
     }
 
     @Test
     void whenAccessSecuredWithoutAuth_thenRedirectsToLogin() throws Exception {
-        mockMvc.perform(get("/secured"))
+        mockMvc.perform(get("/api/secured"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
     }
@@ -37,7 +37,7 @@ class AuthControllerTest {
     @Test
     @WithMockUser
     void whenAccessSecuredWithAuth_thenReturnSecured() throws Exception {
-        mockMvc.perform(get("/secured"))
+        mockMvc.perform(get("/api/secured"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Secured"));
     }
