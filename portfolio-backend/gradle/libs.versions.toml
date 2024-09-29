@@ -1,0 +1,18 @@
+[versions]
+springframework-boot = "3.3.3"
+spring-dependency-management = "1.1.6"
+sonarqube = "4.4.1.3373"
+
+springdoc-openapi-starter-webmvc-ui = "2.6.0"
+
+[libraries]
+# BOM dependencies
+spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springframework-boot"}
+
+# Other dependencies
+springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc-openapi-starter-webmvc-ui" }
+
+[plugins]
+springframework-boot = { id = "org.springframework.boot", version.ref = "springframework-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
