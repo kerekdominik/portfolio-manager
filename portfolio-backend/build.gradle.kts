@@ -44,6 +44,9 @@ dependencies {
 
 	/** Imported and managed manually **/
 	implementation(libs.springdoc.openapi.starter.webmvc.ui)
+	implementation(libs.jjwt.api)
+	implementation(libs.jjwt.impl)
+	implementation(libs.jjwt.jackson)
 	/**********************************/
 
 	runtimeOnly("org.postgresql:postgresql")
