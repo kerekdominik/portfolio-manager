@@ -20,7 +20,7 @@ class UserTest {
 
     @Test
     void testAllArgsConstructor() {
-        User user = new User("testUser", "password123", "test@example.com", "John", "Doe");
+        User user = new User(1L, "testUser", "password123", "test@example.com", "John", "Doe", Role.USER);
 
         assertEquals("testUser", user.getUsername());
         assertEquals("password123", user.getPassword());
