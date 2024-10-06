@@ -1,44 +1,77 @@
 package com.portfolio.controller;
 
+import com.portfolio.dto.AuthenticationResponseDto;
+import com.portfolio.dto.LoginRequestDto;
+import com.portfolio.dto.UserDto;
+import com.portfolio.service.AuthService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class AuthControllerTest {
+    @Mock
+    private AuthService authService;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private AuthController authController;
 
     @Test
-    void whenAccessHome_thenReturnHelloWorld() throws Exception {
-        mockMvc.perform(get("/api/"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Hello, World!"));
+    void testRegister() {
+        // Arrange
+        UserDto userDto = new UserDto();
+        userDto.setUsername("john_doe");
+        userDto.setEmail("john.doe@example.com");
+        userDto.setPassword("SecurePassword123!");
+        userDto.setFirstName("John");
+        userDto.setLastName("Doe");
+        userDto.setRole("USER");
+
+        AuthenticationResponseDto authResponse = new AuthenticationResponseDto();
+        authResponse.setToken("mocked-jwt-token");
+
+        when(authService.register(any(UserDto.class))).thenReturn(authResponse);
+
+        // Act
+        ResponseEntity<AuthenticationResponseDto> response = authController.register(userDto);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertEquals("mocked-jwt-token", response.getBody().getToken());
     }
 
     @Test
-    void whenAccessSecuredWithoutAuth_thenRedirectsToLogin() throws Exception {
-        mockMvc.perform(get("/api/secured"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("**/login"));
-    }
+    void testLogin() {
+        // Arrange
+        LoginRequestDto loginRequestDto = new LoginRequestDto();
+        loginRequestDto.setUsername("john_doe");
+        loginRequestDto.setPassword("SecurePassword123!");
 
-    @Test
-    @WithMockUser
-    void whenAccessSecuredWithAuth_thenReturnSecured() throws Exception {
-        mockMvc.perform(get("/api/secured"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Secured"));
+        AuthenticationResponseDto authResponse = new AuthenticationResponseDto();
+        authResponse.setToken("mocked-jwt-token");
+
+        when(authService.login(any(LoginRequestDto.class))).thenReturn(authResponse);
+
+        // Act
+        ResponseEntity<AuthenticationResponseDto> response = authController.login(loginRequestDto);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertEquals("mocked-jwt-token", response.getBody().getToken());
     }
 }
