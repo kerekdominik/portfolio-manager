@@ -47,11 +47,13 @@ dependencies {
 	implementation(libs.jjwt.api)
 	implementation(libs.jjwt.impl)
 	implementation(libs.jjwt.jackson)
+	implementation(libs.mapstruct)
 	/**********************************/
 
 	runtimeOnly("org.postgresql:postgresql")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
+	annotationProcessor(libs.mapstruct.processor)
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
