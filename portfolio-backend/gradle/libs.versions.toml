@@ -4,6 +4,10 @@ spring-dependency-management = "1.1.6"
 sonarqube = "4.4.1.3373"
 
 springdoc-openapi-starter-webmvc-ui = "2.6.0"
+jjwt-api="0.11.5"
+jjwt-impl="0.11.5"
+jjwt-jackson="0.11.5"
+mapstruct = "1.5.3.Final"
 
 [libraries]
 # BOM dependencies
@@ -11,6 +15,11 @@ spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies"
 
 # Other dependencies
 springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc-openapi-starter-webmvc-ui" }
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt-api" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt-impl" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt-jackson" }
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 
 [plugins]
 springframework-boot = { id = "org.springframework.boot", version.ref = "springframework-boot" }

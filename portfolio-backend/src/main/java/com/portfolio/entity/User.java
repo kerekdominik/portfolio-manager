@@ -1,17 +1,23 @@
 package com.portfolio.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "\"user\"")
-public class User {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "\"users\"")
+public class User implements UserDetails {
     @Id
+    @GeneratedValue
     private long id;
     private String username;
     private String password;
@@ -19,17 +25,31 @@ public class User {
     private String firstName;
     private String lastName;
 
-    public User(String username, String password, String email, String firstName, String lastName) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    public User() {
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
 
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
     }
 }
-
-
