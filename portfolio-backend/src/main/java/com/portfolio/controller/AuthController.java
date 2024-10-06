@@ -1,24 +1,31 @@
 package com.portfolio.controller;
 
+import com.portfolio.dto.AuthenticationResponseDto;
+import com.portfolio.dto.LoginRequestDto;
+import com.portfolio.dto.UserDto;
+import com.portfolio.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @Tag(name = "AuthController", description = "API for authentication")
 public class AuthController {
+    private final AuthService service;
 
-    @GetMapping("/")
-    @Operation(summary = "Welcome message", description = "Returns a welcome message")
-    public String home() {
-        return "Hello, World!";
+    @PostMapping("/register")
+    @Operation(summary = "Register a new user", description = "Registers a new user and returns an authentication token.")
+    public ResponseEntity<AuthenticationResponseDto> register(@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(service.register(userDto));
     }
 
-    @GetMapping("/secured")
-    public String secured() {
-        return "Secured";
+    @PostMapping("/login")
+    @Operation(summary = "Login", description = "Logs in a user and returns an authentication token.")
+    public ResponseEntity<AuthenticationResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+        return ResponseEntity.ok(service.login(loginRequestDto));
     }
 }
