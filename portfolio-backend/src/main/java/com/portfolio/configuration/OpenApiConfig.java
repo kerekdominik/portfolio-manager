@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
         scheme = "bearer",
         bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER
+        // TODO: Add oauth2 scheme
 )
 public class OpenApiConfig {
 
