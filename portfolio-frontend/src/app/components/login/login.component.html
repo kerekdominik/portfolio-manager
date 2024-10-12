@@ -1,0 +1,23 @@
+<div class="login-container">
+  <mat-card>
+    <mat-card-title class="center-title">Portfolio-Manager Login</mat-card-title>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <mat-form-field class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" name="email" ngModel required>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" name="password" ngModel required>
+        </mat-form-field>
+
+        <div class="button-group">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">Login</button>
+          <button mat-raised-button color="accent" (click)="navigateToRegister()">Register</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
