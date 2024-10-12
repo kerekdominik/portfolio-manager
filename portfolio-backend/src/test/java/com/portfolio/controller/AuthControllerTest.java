@@ -2,7 +2,7 @@ package com.portfolio.controller;
 
 import com.portfolio.dto.AuthenticationResponseDto;
 import com.portfolio.dto.LoginRequestDto;
-import com.portfolio.dto.UserDto;
+import com.portfolio.dto.RegisterRequestDto;
 import com.portfolio.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,21 +30,21 @@ class AuthControllerTest {
     @Test
     void testRegister() {
         // Arrange
-        UserDto userDto = new UserDto();
-        userDto.setUsername("john_doe");
-        userDto.setEmail("john.doe@example.com");
-        userDto.setPassword("SecurePassword123!");
-        userDto.setFirstName("John");
-        userDto.setLastName("Doe");
-        userDto.setRole("USER");
+        RegisterRequestDto registerRequestDto = new RegisterRequestDto();
+        registerRequestDto.setUsername("john_doe");
+        registerRequestDto.setEmail("john.doe@example.com");
+        registerRequestDto.setPassword("SecurePassword123!");
+        registerRequestDto.setFirstName("John");
+        registerRequestDto.setLastName("Doe");
+        registerRequestDto.setRole("USER");
 
         AuthenticationResponseDto authResponse = new AuthenticationResponseDto();
         authResponse.setToken("mocked-jwt-token");
 
-        when(authService.register(any(UserDto.class))).thenReturn(authResponse);
+        when(authService.register(any(RegisterRequestDto.class))).thenReturn(authResponse);
 
         // Act
-        ResponseEntity<AuthenticationResponseDto> response = authController.register(userDto);
+        ResponseEntity<AuthenticationResponseDto> response = authController.register(registerRequestDto);
 
         // Assert
         assertNotNull(response);
