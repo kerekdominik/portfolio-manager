@@ -2,7 +2,7 @@ package com.portfolio.service;
 
 import com.portfolio.dto.AuthenticationResponseDto;
 import com.portfolio.dto.LoginRequestDto;
-import com.portfolio.dto.UserDto;
+import com.portfolio.dto.RegisterRequestDto;
 import com.portfolio.entity.User;
 import com.portfolio.mapper.UserMapper;
 import com.portfolio.repository.UserRepository;
@@ -45,33 +45,33 @@ class AuthServiceTest {
     @Test
     void testRegister() {
         // Arrange
-        UserDto userDto = new UserDto();
-        userDto.setUsername("testUser");
-        userDto.setPassword("password123");
-        userDto.setEmail("test@example.com");
-        userDto.setFirstName("John");
-        userDto.setLastName("Doe");
-        userDto.setRole("USER");
+        RegisterRequestDto registerRequestDto = new RegisterRequestDto();
+        registerRequestDto.setUsername("testUser");
+        registerRequestDto.setPassword("password123");
+        registerRequestDto.setEmail("test@example.com");
+        registerRequestDto.setFirstName("John");
+        registerRequestDto.setLastName("Doe");
+        registerRequestDto.setRole("USER");
 
         // Create a spy for the User object
         User user = spy(new User());
         user.setUsername("testUser");
 
         // Mock behaviors
-        when(userMapper.userDtoToUser(any(UserDto.class))).thenReturn(user);
+        when(userMapper.userDtoToUser(any(RegisterRequestDto.class))).thenReturn(user);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(jwtService.generateToken(any(User.class))).thenReturn("jwtToken");
 
         // Act
-        AuthenticationResponseDto response = authService.register(userDto);
+        AuthenticationResponseDto response = authService.register(registerRequestDto);
 
         // Assert
         assertNotNull(response);
         assertEquals("jwtToken", response.getToken());
 
         // Verify interactions
-        verify(userMapper).userDtoToUser(userDto);
+        verify(userMapper).userDtoToUser(registerRequestDto);
         verify(passwordEncoder).encode("password123");
         verify(user).setPassword("encodedPassword"); // Now this works because 'user' is a spy
         verify(userRepository).save(user);

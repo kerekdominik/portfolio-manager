@@ -2,7 +2,7 @@ package com.portfolio.controller;
 
 import com.portfolio.dto.AuthenticationResponseDto;
 import com.portfolio.dto.LoginRequestDto;
-import com.portfolio.dto.UserDto;
+import com.portfolio.dto.RegisterRequestDto;
 import com.portfolio.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,8 +20,8 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Registers a new user and returns an authentication token.")
-    public ResponseEntity<AuthenticationResponseDto> register(@Valid @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(service.register(userDto));
+    public ResponseEntity<AuthenticationResponseDto> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
+        return ResponseEntity.ok(service.register(registerRequestDto));
     }
 
     @PostMapping("/login")

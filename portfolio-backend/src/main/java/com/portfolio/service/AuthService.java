@@ -2,7 +2,7 @@ package com.portfolio.service;
 
 import com.portfolio.dto.AuthenticationResponseDto;
 import com.portfolio.dto.LoginRequestDto;
-import com.portfolio.dto.UserDto;
+import com.portfolio.dto.RegisterRequestDto;
 import com.portfolio.entity.User;
 import com.portfolio.mapper.UserMapper;
 import com.portfolio.repository.UserRepository;
@@ -21,9 +21,9 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponseDto register(UserDto userDto) {
-        User user = userMapper.userDtoToUser(userDto);
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+    public AuthenticationResponseDto register(RegisterRequestDto registerRequestDto) {
+        User user = userMapper.userDtoToUser(registerRequestDto);
+        user.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         userRepository.save(user);
 
         String jwtToken = jwtService.generateToken(user);
