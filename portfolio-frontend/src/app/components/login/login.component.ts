@@ -5,6 +5,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {Router} from '@angular/router';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,10 +21,31 @@ import {Router} from '@angular/router';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  constructor(private readonly router: Router) {}
+  username: string = '';
+  password: string = '';
+  errorMessage: string = '';
+
+  constructor(
+    private readonly router: Router,
+    private readonly authService: AuthService
+  ) {}
 
   onSubmit() {
     console.log('Form submitted');
+    console.log('Username:', this.username);
+    console.log('Password:', this.password);
+    this.authService.login(this.username, this.password)
+      .subscribe({
+        next: (response) => {
+          console.log('Login successful', response);
+          // Handle successful login
+          this.router.navigate(['/dashboard']).then(r => console.log(r));
+        },
+        error: (error) => {
+          console.error('Login failed', error);
+          this.errorMessage = 'Invalid username or password';
+        }
+      });
   }
 
   navigateToRegister() {
