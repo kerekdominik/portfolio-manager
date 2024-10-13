@@ -31,9 +31,6 @@ export class LoginComponent {
   ) {}
 
   onSubmit() {
-    console.log('Form submitted');
-    console.log('Username:', this.username);
-    console.log('Password:', this.password);
     this.authService.login(this.username, this.password)
       .subscribe({
         next: (response) => {
