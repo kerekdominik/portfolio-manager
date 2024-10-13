@@ -1,5 +1,6 @@
 package com.portfolio.dto;
 
+import com.portfolio.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -23,4 +24,6 @@ public class RegisterRequestDto {
 
     @NotBlank(message = "Last name is mandatory")
     private String lastName;
+
+    private String role = Role.USER.name();
 }
