@@ -18,9 +18,6 @@ public class RegisterRequestDto {
     @Size(min = 6, message = "Password should have at least 6 characters")
     private String password;
 
-    @NotBlank(message = "Role is mandatory")
-    private String role;
-
     @NotBlank(message = "First name is mandatory")
     private String firstName;
 
