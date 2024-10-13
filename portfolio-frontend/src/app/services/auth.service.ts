@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/envrionment.dev'; // Adjust the path
+import { environment } from '../../environments/envrionment.dev';
+import {Observable} from 'rxjs'; // Adjust the path
 
 @Injectable({
   providedIn: 'root'
@@ -15,4 +16,8 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/auth/login`, loginData);
   }
 
+  register(username: string, password: string, email: string, firstName: string, lastName: string): Observable<any> {
+    const registrationData = { username, password, email, firstName, lastName };
+    return this.http.post(`${this.baseUrl}/auth/register`, registrationData);
+  }
 }
