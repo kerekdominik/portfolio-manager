@@ -1,6 +1,5 @@
 package com.portfolio.configuration.security;
 
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,30 +21,29 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
+        http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll();
-                    auth.anyRequest().authenticated();
-                })
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/login/oauth2/**",
+                                "/oauth2/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/api/auth/oauth2/authorize")
+                        .defaultSuccessUrl("/api/auth/oauth2/success", true)
                 )
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        /*
-                .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll();
-                    auth.anyRequest().authenticated();
-                })
-                .oauth2Login( oauth2 -> oauth2
-                        .defaultSuccessUrl("/api/")
-                )
-                .formLogin( form -> form
-                        .defaultSuccessUrl("/api/")
-                )
-        */
+        return http.build();
     }
 }
