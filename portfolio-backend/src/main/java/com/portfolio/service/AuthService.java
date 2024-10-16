@@ -46,4 +46,22 @@ public class AuthService {
                 .token(jwtToken)
                 .build();
     }
+
+    public AuthenticationResponseDto authenticateWithOAuth2(String email, String firstName, String lastName) {
+        User user = userRepository.findByUsername(email).orElse(null);
+
+        if (user == null) {
+            user = new User();
+            user.setUsername(firstName+lastName);
+            user.setEmail(email);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            userRepository.save(user);
+        }
+
+        String jwtToken = jwtService.generateToken(user);
+        return AuthenticationResponseDto.builder()
+                .token(jwtToken)
+                .build();
+    }
 }
