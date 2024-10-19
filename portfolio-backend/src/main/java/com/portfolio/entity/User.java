@@ -19,9 +19,10 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     private long id;
+    @Column(unique = true, nullable = false)
+    private String email;
     private String username;
     private String password;
-    private String email;
     private String firstName;
     private String lastName;
 
