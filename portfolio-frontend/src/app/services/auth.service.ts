@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/envrionment.dev'; // Adjust the path
+import { environment } from '../../environments/envrionment.dev';
+import {Observable, tap} from 'rxjs';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -8,11 +10,33 @@ import { environment } from '../../environments/envrionment.dev'; // Adjust the 
 export class AuthService {
   private readonly baseUrl = environment.apiBaseUrl;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
-  login(username: string, password: string) {
-    const loginData = { username, password };
-    return this.http.post(`${this.baseUrl}/auth/login`, loginData);
+  login(email: string, password: string) {
+    const loginData = { email, password };
+    return this.http.post<{ token: string }>(`${this.baseUrl}/auth/login`, loginData)
+      .pipe(
+        tap(response => {
+          localStorage.setItem('jwtToken', response.token);
+        })
+      );
   }
 
+  register(username: string, password: string, email: string, firstName: string, lastName: string): Observable<any> {
+    const registrationData = { username, password, email, firstName, lastName };
+    return this.http.post(`${this.baseUrl}/auth/register`, registrationData);
+  }
+
+  googleLogin() {
+    window.location.href = `${this.baseUrl}/auth/oauth2/authorize`;
+  }
+
+  logout() {
+    localStorage.removeItem('jwtToken');
+    this.router.navigate(['']).then(r => console.log(r));
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('jwtToken');
+  }
 }

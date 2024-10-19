@@ -22,6 +22,10 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponseDto register(RegisterRequestDto registerRequestDto) {
+        if (userRepository.findByEmail(registerRequestDto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+
         User user = userMapper.userDtoToUser(registerRequestDto);
         user.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         userRepository.save(user);
@@ -35,12 +39,30 @@ public class AuthService {
     public AuthenticationResponseDto login(LoginRequestDto loginRequestDto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequestDto.getUsername(),
+                        loginRequestDto.getEmail(),
                         loginRequestDto.getPassword()
                 )
         );
-        User user = userRepository.findByUsername(loginRequestDto.getUsername())
+        User user = userRepository.findByEmail(loginRequestDto.getEmail())
                 .orElseThrow();
+        String jwtToken = jwtService.generateToken(user);
+        return AuthenticationResponseDto.builder()
+                .token(jwtToken)
+                .build();
+    }
+
+    public AuthenticationResponseDto authenticateWithOAuth2(String email, String firstName, String lastName) {
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            user = new User();
+            user.setUsername(firstName+lastName);
+            user.setEmail(email);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            userRepository.save(user);
+        }
+
         String jwtToken = jwtService.generateToken(user);
         return AuthenticationResponseDto.builder()
                 .token(jwtToken)
