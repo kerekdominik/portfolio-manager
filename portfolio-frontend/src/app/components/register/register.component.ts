@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { Router } from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
 
 @Component({
@@ -15,7 +15,8 @@ import {AuthService} from '../../services/auth.service';
     FormsModule,
     MatInputModule,
     MatButtonModule,
-    MatCardModule
+    MatCardModule,
+    RouterLink
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
@@ -23,6 +24,7 @@ import {AuthService} from '../../services/auth.service';
 export class RegisterComponent {
   username: string = '';
   password: string = '';
+  confirmPassword: string = '';
   email: string = '';
   firstName: string = '';
   lastName: string = '';
@@ -55,5 +57,9 @@ export class RegisterComponent {
           this.errorMessage = 'Invalid registration data';
         }
       });
+  }
+
+  passwordsMatch(): boolean {
+    return this.password === this.confirmPassword;
   }
 }
