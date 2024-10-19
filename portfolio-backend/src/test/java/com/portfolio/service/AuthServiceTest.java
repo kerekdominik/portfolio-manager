@@ -43,7 +43,7 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Test
-    void testRegister() {
+    void testRegister_Successful() {
         // Arrange
         RegisterRequestDto registerRequestDto = new RegisterRequestDto();
         registerRequestDto.setUsername("testUser");
@@ -53,15 +53,15 @@ class AuthServiceTest {
         registerRequestDto.setLastName("Doe");
         registerRequestDto.setRole("USER");
 
-        // Create a spy for the User object
         User user = spy(new User());
         user.setUsername("testUser");
 
         // Mock behaviors
-        when(userMapper.userDtoToUser(any(RegisterRequestDto.class))).thenReturn(user);
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(user);
-        when(jwtService.generateToken(any(User.class))).thenReturn("jwtToken");
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+        when(userMapper.userDtoToUser(registerRequestDto)).thenReturn(user);
+        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(userRepository.save(user)).thenReturn(user);
+        when(jwtService.generateToken(user)).thenReturn("jwtToken");
 
         // Act
         AuthenticationResponseDto response = authService.register(registerRequestDto);
@@ -71,27 +71,48 @@ class AuthServiceTest {
         assertEquals("jwtToken", response.getToken());
 
         // Verify interactions
+        verify(userRepository).findByEmail("test@example.com");
         verify(userMapper).userDtoToUser(registerRequestDto);
         verify(passwordEncoder).encode("password123");
-        verify(user).setPassword("encodedPassword"); // Now this works because 'user' is a spy
+        verify(user).setPassword("encodedPassword");
         verify(userRepository).save(user);
         verify(jwtService).generateToken(user);
     }
 
     @Test
-    void testLogin() {
+    void testRegister_EmailAlreadyInUse() {
+        // Arrange
+        RegisterRequestDto registerRequestDto = new RegisterRequestDto();
+        registerRequestDto.setEmail("test@example.com");
+
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(new User()));
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            authService.register(registerRequestDto);
+        });
+
+        assertEquals("Email already in use", exception.getMessage());
+
+        // Verify interactions
+        verify(userRepository).findByEmail("test@example.com");
+        verifyNoMoreInteractions(userMapper, passwordEncoder, userRepository, jwtService);
+    }
+
+    @Test
+    void testLogin_Successful() {
         // Arrange
         LoginRequestDto loginRequestDto = new LoginRequestDto();
-        loginRequestDto.setUsername("testUser");
+        loginRequestDto.setEmail("test@example.com");
         loginRequestDto.setPassword("password123");
 
         User user = new User();
-        user.setUsername("testUser");
+        user.setEmail("test@example.com");
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(null); // Since authenticate method returns void or Authentication
-        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(any(User.class))).thenReturn("jwtToken");
+                .thenReturn(null); // Az authenticate metódus void vagy Authentication típust ad vissza
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(jwtService.generateToken(user)).thenReturn("jwtToken");
 
         // Act
         AuthenticationResponseDto response = authService.login(loginRequestDto);
@@ -102,7 +123,7 @@ class AuthServiceTest {
 
         // Verify interactions
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(userRepository).findByUsername("testUser");
+        verify(userRepository).findByEmail("test@example.com");
         verify(jwtService).generateToken(user);
     }
 
@@ -110,19 +131,77 @@ class AuthServiceTest {
     void testLogin_UserNotFound() {
         // Arrange
         LoginRequestDto loginRequestDto = new LoginRequestDto();
-        loginRequestDto.setUsername("nonExistentUser");
+        loginRequestDto.setEmail("nonexistent@example.com");
         loginRequestDto.setPassword("password123");
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(null);
-        when(userRepository.findByUsername("nonExistentUser")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> authService.login(loginRequestDto));
 
         // Verify interactions
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(userRepository).findByUsername("nonExistentUser");
+        verify(userRepository).findByEmail("nonexistent@example.com");
         verify(jwtService, never()).generateToken(any(User.class));
+    }
+
+    @Test
+    void testAuthenticateWithOAuth2_UserExists() {
+        // Arrange
+        String email = "test@example.com";
+        String firstName = "John";
+        String lastName = "Doe";
+
+        User user = new User();
+        user.setEmail(email);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(jwtService.generateToken(user)).thenReturn("jwtToken");
+
+        // Act
+        AuthenticationResponseDto response = authService.authenticateWithOAuth2(email, firstName, lastName);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals("jwtToken", response.getToken());
+
+        // Verify interactions
+        verify(userRepository).findByEmail(email);
+        verify(jwtService).generateToken(user);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testAuthenticateWithOAuth2_UserDoesNotExist() {
+        // Arrange
+        String email = "newuser@example.com";
+        String firstName = "Jane";
+        String lastName = "Doe";
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.save(userCaptor.capture())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(jwtService.generateToken(any(User.class))).thenReturn("jwtToken");
+
+        // Act
+        AuthenticationResponseDto response = authService.authenticateWithOAuth2(email, firstName, lastName);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals("jwtToken", response.getToken());
+
+        User savedUser = userCaptor.getValue();
+        assertEquals(firstName + lastName, savedUser.getUsername());
+        assertEquals(email, savedUser.getEmail());
+        assertEquals(firstName, savedUser.getFirstName());
+        assertEquals(lastName, savedUser.getLastName());
+
+        // Verify interactions
+        verify(userRepository).findByEmail(email);
+        verify(userRepository).save(savedUser);
+        verify(jwtService).generateToken(savedUser);
     }
 }
