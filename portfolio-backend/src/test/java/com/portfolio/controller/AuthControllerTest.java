@@ -4,31 +4,37 @@ import com.portfolio.dto.AuthenticationResponseDto;
 import com.portfolio.dto.LoginRequestDto;
 import com.portfolio.dto.RegisterRequestDto;
 import com.portfolio.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import java.io.IOException;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(SpringExtension.class)
 class AuthControllerTest {
+
     @Mock
     private AuthService authService;
 
     @InjectMocks
     private AuthController authController;
 
+    @Mock
+    private HttpServletResponse response;
+
+    @Mock
+    private OAuth2User principal;
+
     @Test
-    void testRegister() {
+    void testRegister_Success() {
         // Arrange
         RegisterRequestDto registerRequestDto = new RegisterRequestDto();
         registerRequestDto.setUsername("john_doe");
@@ -38,40 +44,81 @@ class AuthControllerTest {
         registerRequestDto.setLastName("Doe");
         registerRequestDto.setRole("USER");
 
-        AuthenticationResponseDto authResponse = new AuthenticationResponseDto();
-        authResponse.setToken("mocked-jwt-token");
+        AuthenticationResponseDto authResponse = AuthenticationResponseDto.builder()
+                .token("mocked-jwt-token")
+                .build();
 
         when(authService.register(any(RegisterRequestDto.class))).thenReturn(authResponse);
 
         // Act
-        ResponseEntity<AuthenticationResponseDto> response = authController.register(registerRequestDto);
+        ResponseEntity<AuthenticationResponseDto> responseEntity = authController.register(registerRequestDto);
 
         // Assert
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode().value());
-        assertNotNull(response.getBody());
-        assertEquals("mocked-jwt-token", response.getBody().getToken());
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertEquals("mocked-jwt-token", responseEntity.getBody().getToken());
+
+        verify(authService).register(registerRequestDto);
     }
 
     @Test
-    void testLogin() {
+    void testLogin_Success() {
         // Arrange
         LoginRequestDto loginRequestDto = new LoginRequestDto();
-        loginRequestDto.setUsername("john_doe");
+        loginRequestDto.setEmail("john.doe@example.com");
         loginRequestDto.setPassword("SecurePassword123!");
 
-        AuthenticationResponseDto authResponse = new AuthenticationResponseDto();
-        authResponse.setToken("mocked-jwt-token");
+        AuthenticationResponseDto authResponse = AuthenticationResponseDto.builder()
+                .token("mocked-jwt-token")
+                .build();
 
         when(authService.login(any(LoginRequestDto.class))).thenReturn(authResponse);
 
         // Act
-        ResponseEntity<AuthenticationResponseDto> response = authController.login(loginRequestDto);
+        ResponseEntity<AuthenticationResponseDto> responseEntity = authController.login(loginRequestDto);
 
         // Assert
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode().value());
-        assertNotNull(response.getBody());
-        assertEquals("mocked-jwt-token", response.getBody().getToken());
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertEquals("mocked-jwt-token", responseEntity.getBody().getToken());
+
+        verify(authService).login(loginRequestDto);
+    }
+
+    @Test
+    void testRedirectToGoogleAuth() throws IOException {
+        // Act
+        authController.redirectToGoogleAuth(response);
+
+        // Assert
+        verify(response).sendRedirect("/oauth2/authorization/google");
+    }
+
+    @Test
+    void testOauth2Success() throws IOException {
+        // Arrange
+        when(principal.getAttribute("email")).thenReturn("john.doe@example.com");
+        when(principal.getAttribute("given_name")).thenReturn("John");
+        when(principal.getAttribute("family_name")).thenReturn("Doe");
+
+        AuthenticationResponseDto authResponse = AuthenticationResponseDto.builder()
+                .token("mocked-jwt-token")
+                .build();
+
+        when(authService.authenticateWithOAuth2("john.doe@example.com", "John", "Doe")).thenReturn(authResponse);
+
+        ArgumentCaptor<String> redirectUrlCaptor = ArgumentCaptor.forClass(String.class);
+
+        // Act
+        authController.oauth2Success(response, principal);
+
+        // Assert
+        verify(response).sendRedirect(redirectUrlCaptor.capture());
+        String redirectUrl = redirectUrlCaptor.getValue();
+        assertEquals("http://localhost:4200/oauth2/redirect?token=mocked-jwt-token", redirectUrl);
+
+        verify(authService).authenticateWithOAuth2("john.doe@example.com", "John", "Doe");
     }
 }

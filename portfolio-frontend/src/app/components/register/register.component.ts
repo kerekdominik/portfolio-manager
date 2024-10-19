@@ -5,6 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -20,9 +21,39 @@ import { Router } from '@angular/router';
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
-  constructor(private readonly router: Router) {}
+  username: string = '';
+  password: string = '';
+  email: string = '';
+  firstName: string = '';
+  lastName: string = '';
+  errorMessage: string = '';
+
+  constructor(
+    private readonly router: Router,
+    private readonly authService: AuthService
+  ) {}
 
   onSubmit() {
-    console.log('Registration form submitted');
+    // Access form data using component properties
+    console.log('Registration form submitted', {
+      username: this.username,
+      password: this.password,
+      email: this.email,
+      firstName: this.firstName,
+      lastName: this.lastName
+    });
+
+    this.authService.register(this.username, this.password, this.email, this.firstName, this.lastName)
+      .subscribe({
+        next: (response) => {
+          console.log('Registration successful', response);
+          // Handle successful registration, navigation to login page
+          this.router.navigate(['']).then(r => console.log(r));
+        },
+        error: (error) => {
+          console.error('Registration failed', error);
+          this.errorMessage = 'Invalid registration data';
+        }
+      });
   }
 }

@@ -28,9 +28,9 @@ class UserTest {
     void testAllArgsConstructor() {
         User userAllArgs = new User(
                 1L,
+                "test@example.com",
                 "testUser",
                 "password123",
-                "test@example.com",
                 "John",
                 "Doe",
                 Role.USER

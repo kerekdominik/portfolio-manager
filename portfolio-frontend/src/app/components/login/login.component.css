@@ -21,3 +21,15 @@ mat-card {
   justify-content: space-between;
   margin-top: 20px;
 }
+
+.other-button-group {
+  display: flex;
+  justify-content: normal;
+  margin-top: 20px;
+}
+
+.google-login-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
