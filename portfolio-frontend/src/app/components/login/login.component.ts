@@ -21,7 +21,7 @@ import {AuthService} from '../../services/auth.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  username: string = '';
+  email: string = '';
   password: string = '';
   errorMessage: string = '';
 
@@ -31,21 +31,33 @@ export class LoginComponent {
   ) {}
 
   onSubmit() {
-    this.authService.login(this.username, this.password)
+    this.authService.login(this.email, this.password)
       .subscribe({
         next: (response) => {
           console.log('Login successful', response);
-          // Handle successful login
           this.router.navigate(['/dashboard']).then(r => console.log(r));
         },
         error: (error) => {
-          console.error('Login failed', error);
-          this.errorMessage = 'Invalid username or password';
+          if (error.status === 401) {
+            console.error('Unauthorized', error);
+            this.errorMessage = 'Invalid email or password';
+          } else {
+            console.error('Login failed', error);
+            this.errorMessage = 'Error happened during login';
+          }
         }
       });
   }
 
   navigateToRegister() {
     this.router.navigate(['/register']).then(r => console.log(r));
+  }
+
+  onGoogleLogin() {
+    this.authService.googleLogin();
+  }
+
+  onGithubLogin() {
+    this.authService.githubLogin();
   }
 }

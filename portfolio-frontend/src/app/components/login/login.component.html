@@ -5,7 +5,7 @@
       <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
         <mat-form-field class="full-width">
           <mat-label>Username</mat-label>
-          <input matInput type="text" name="username" [(ngModel)]="username" required>
+          <input matInput type="email" name="email" [(ngModel)]="email" required>
         </mat-form-field>
 
         <mat-form-field class="full-width">
@@ -17,7 +17,16 @@
           <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">Login</button>
           <button mat-raised-button color="accent" (click)="navigateToRegister()">Register</button>
         </div>
+        <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
       </form>
+      <div class="other-button-group">
+        <button (click)="onGithubLogin()" class="github-login-button">
+          <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Sign-In button" class="github-logo">
+        </button>
+        <button (click)="onGoogleLogin()" class="google-login-button">
+          <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" alt="Google Sign-In button">
+        </button>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>
