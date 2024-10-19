@@ -31,10 +31,6 @@ export class AuthService {
     window.location.href = `${this.baseUrl}/auth/oauth2/authorize`;
   }
 
-  githubLogin() {
-    window.location.href = `${this.baseUrl}/auth/oauth2/authorize`;
-  }
-
   logout() {
     localStorage.removeItem('jwtToken');
     this.router.navigate(['']).then(r => console.log(r));

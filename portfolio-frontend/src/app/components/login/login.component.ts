@@ -56,8 +56,4 @@ export class LoginComponent {
   onGoogleLogin() {
     this.authService.googleLogin();
   }
-
-  onGithubLogin() {
-    this.authService.githubLogin();
-  }
 }
