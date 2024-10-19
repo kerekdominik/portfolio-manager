@@ -15,9 +15,9 @@ export class Oauth2RedirectComponent implements OnInit {
       const token = params['token'];
       if (token) {
         localStorage.setItem('jwtToken', token);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard']).then(r => console.log(r));
       } else {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login']).then(r => console.log(r));
       }
     });
   }

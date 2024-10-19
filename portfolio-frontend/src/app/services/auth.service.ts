@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/envrionment.dev';
-import {Observable, tap} from 'rxjs'; // Adjust the path
+import {Observable, tap} from 'rxjs';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import {Observable, tap} from 'rxjs'; // Adjust the path
 export class AuthService {
   private readonly baseUrl = environment.apiBaseUrl;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
   login(email: string, password: string) {
     const loginData = { email, password };
@@ -36,6 +37,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('jwtToken');
+    this.router.navigate(['']).then(r => console.log(r));
   }
 
   isAuthenticated(): boolean {

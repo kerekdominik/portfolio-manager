@@ -4,9 +4,10 @@ import {RegisterComponent} from './components/register/register.component';
 import {DashboardComponent} from './components/dashboard/dashboard.component';
 import {Oauth2RedirectComponent} from './components/oauth2-redirect/oauth2-redirect.component';
 import {AuthGuard} from './guards/auth.guard';
+import {LoginGuard} from './guards/login.guard';
 
 export const routes: Routes = [
-  { path: '', component: LoginComponent },
+  { path: '', component: LoginComponent, canActivate: [LoginGuard] },
   { path: 'register', component: RegisterComponent },
   { path: 'oauth2/redirect', component: Oauth2RedirectComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
