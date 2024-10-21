@@ -1,4 +1,4 @@
-package com.portfolio.dto;
+package com.portfolio.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
