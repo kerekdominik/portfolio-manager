@@ -1,6 +1,7 @@
 package com.portfolio.mapper;
 
-import com.portfolio.dto.RegisterRequestDto;
+import com.portfolio.dto.UserResponseDto;
+import com.portfolio.dto.auth.RegisterRequestDto;
 import com.portfolio.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,4 +12,5 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     User userDtoToUser(RegisterRequestDto registerRequestDto);
 
+    UserResponseDto userToUserResponseDto(User user);
 }
