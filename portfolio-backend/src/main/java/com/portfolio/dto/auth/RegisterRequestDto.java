@@ -1,4 +1,4 @@
-package com.portfolio.dto;
+package com.portfolio.dto.auth;
 
 import com.portfolio.entity.Role;
 import jakarta.validation.constraints.Email;

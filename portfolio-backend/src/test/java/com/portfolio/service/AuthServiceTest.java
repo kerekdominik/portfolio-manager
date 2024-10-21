@@ -1,8 +1,8 @@
 package com.portfolio.service;
 
-import com.portfolio.dto.AuthenticationResponseDto;
-import com.portfolio.dto.LoginRequestDto;
-import com.portfolio.dto.RegisterRequestDto;
+import com.portfolio.dto.auth.AuthenticationResponseDto;
+import com.portfolio.dto.auth.LoginRequestDto;
+import com.portfolio.dto.auth.RegisterRequestDto;
 import com.portfolio.entity.User;
 import com.portfolio.mapper.UserMapper;
 import com.portfolio.repository.UserRepository;
@@ -41,6 +41,9 @@ class AuthServiceTest {
 
     @InjectMocks
     private AuthService authService;
+
+    @InjectMocks
+    private OAuth2Service oAuth2Service;
 
     @Test
     void testRegister_Successful() {
@@ -161,7 +164,7 @@ class AuthServiceTest {
         when(jwtService.generateToken(user)).thenReturn("jwtToken");
 
         // Act
-        AuthenticationResponseDto response = authService.authenticateWithOAuth2(email, firstName, lastName);
+        AuthenticationResponseDto response = oAuth2Service.authenticateWithOAuth2(email, firstName, lastName);
 
         // Assert
         assertNotNull(response);
@@ -187,7 +190,7 @@ class AuthServiceTest {
         when(jwtService.generateToken(any(User.class))).thenReturn("jwtToken");
 
         // Act
-        AuthenticationResponseDto response = authService.authenticateWithOAuth2(email, firstName, lastName);
+        AuthenticationResponseDto response = oAuth2Service.authenticateWithOAuth2(email, firstName, lastName);
 
         // Assert
         assertNotNull(response);

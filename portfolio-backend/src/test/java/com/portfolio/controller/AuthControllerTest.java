@@ -1,8 +1,8 @@
 package com.portfolio.controller;
 
-import com.portfolio.dto.AuthenticationResponseDto;
-import com.portfolio.dto.LoginRequestDto;
-import com.portfolio.dto.RegisterRequestDto;
+import com.portfolio.dto.auth.AuthenticationResponseDto;
+import com.portfolio.dto.auth.LoginRequestDto;
+import com.portfolio.dto.auth.RegisterRequestDto;
 import com.portfolio.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
@@ -29,9 +28,6 @@ class AuthControllerTest {
 
     @Mock
     private HttpServletResponse response;
-
-    @Mock
-    private OAuth2User principal;
 
     @Test
     void testRegister_Success() {
@@ -94,31 +90,5 @@ class AuthControllerTest {
 
         // Assert
         verify(response).sendRedirect("/oauth2/authorization/google");
-    }
-
-    @Test
-    void testOauth2Success() throws IOException {
-        // Arrange
-        when(principal.getAttribute("email")).thenReturn("john.doe@example.com");
-        when(principal.getAttribute("given_name")).thenReturn("John");
-        when(principal.getAttribute("family_name")).thenReturn("Doe");
-
-        AuthenticationResponseDto authResponse = AuthenticationResponseDto.builder()
-                .token("mocked-jwt-token")
-                .build();
-
-        when(authService.authenticateWithOAuth2("john.doe@example.com", "John", "Doe")).thenReturn(authResponse);
-
-        ArgumentCaptor<String> redirectUrlCaptor = ArgumentCaptor.forClass(String.class);
-
-        // Act
-        authController.oauth2Success(response, principal);
-
-        // Assert
-        verify(response).sendRedirect(redirectUrlCaptor.capture());
-        String redirectUrl = redirectUrlCaptor.getValue();
-        assertEquals("http://localhost:4200/oauth2/redirect?token=mocked-jwt-token", redirectUrl);
-
-        verify(authService).authenticateWithOAuth2("john.doe@example.com", "John", "Doe");
     }
 }
