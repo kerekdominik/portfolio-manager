@@ -9,6 +9,7 @@ import {Router} from '@angular/router';
 })
 export class AuthService {
   private readonly baseUrl = environment.apiBaseUrl;
+  private tokenKey = 'authToken';
 
   constructor(private readonly http: HttpClient, private readonly router: Router) {}
 
@@ -17,7 +18,7 @@ export class AuthService {
     return this.http.post<{ token: string }>(`${this.baseUrl}/auth/login`, loginData)
       .pipe(
         tap(response => {
-          localStorage.setItem('jwtToken', response.token);
+          this.setToken(response.token);
         })
       );
   }
@@ -32,11 +33,23 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('jwtToken');
+    this.removeToken();
     this.router.navigate(['']).then(r => console.log(r));
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('jwtToken');
+    return !!this.getToken();
+  }
+
+  setToken(token: string): void {
+    localStorage.setItem(this.tokenKey, token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  removeToken(): void {
+    localStorage.removeItem(this.tokenKey);
   }
 }

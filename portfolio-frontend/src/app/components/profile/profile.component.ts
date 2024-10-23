@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import {NgOptimizedImage} from '@angular/common';
+import {User, UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -11,10 +12,18 @@ import {NgOptimizedImage} from '@angular/common';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent {
-  // TODO: do not hard code
-  user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    bio: 'Software Developer at XYZ Company'
-  };
+  user: User | null = null;
+
+  constructor(private userService: UserService) { }
+
+  ngOnInit(): void {
+    this.userService.getCurrentUser().subscribe({
+      next: (data) => {
+        this.user = data;
+      },
+      error: (error) => {
+        console.error('Error loading user data', error);
+      }
+    });
+  }
 }
