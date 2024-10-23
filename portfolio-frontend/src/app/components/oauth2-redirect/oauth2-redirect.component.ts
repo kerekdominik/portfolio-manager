@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-oauth2-redirect',
@@ -8,13 +9,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class Oauth2RedirectComponent implements OnInit {
 
-  constructor(private readonly route: ActivatedRoute, private readonly router: Router) {}
+  constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly authService: AuthService) {}
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
       if (token) {
-        localStorage.setItem('jwtToken', token);
+        this.authService.setToken(token);
         this.router.navigate(['/dashboard']).then(r => console.log(r));
       } else {
         this.router.navigate(['/login']).then(r => console.log(r));
