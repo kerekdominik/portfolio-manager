@@ -1,7 +1,9 @@
 package com.portfolio.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -9,31 +11,21 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "portfolio")
 public class Portfolio {
     @Id
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private  User user;
-    @OneToMany(mappedBy = "portfolio")
-    private List<Stock> stocks;
+    private User user;
 
     @OneToMany(mappedBy = "portfolio")
-    private List<Cryptocurrency> cryptocurrencies;
+    private List<Transaction> transactions;
 
     @OneToMany(mappedBy = "portfolio")
-    private List<Group> groups;
-
-    public Portfolio(long id, User user, List<Stock> stocks, List<Cryptocurrency> cryptocurrencies, List<Group> groups) {
-        this.id = id;
-        this.user = user;
-        this.stocks = stocks;
-        this.cryptocurrencies = cryptocurrencies;
-        this.groups = groups;
-    }
-
-    public Portfolio() {
-
-    }
+    private List<PortfolioAsset> portfolioAssets;
 }

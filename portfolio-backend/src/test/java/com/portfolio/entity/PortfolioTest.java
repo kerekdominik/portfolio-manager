@@ -10,16 +10,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PortfolioTest {
     private User mockUser;
-    private List<Stock> mockStocks;
-    private List<Cryptocurrency> mockCryptocurrencies;
-    private List<Group> mockGroups;
+    private List<Transaction> mockTransactions;
+    private List<PortfolioAsset> mockPortfolioAssets;
 
     @BeforeEach
     void setUp() {
         mockUser = Mockito.mock(User.class);
-        mockStocks = List.of(Mockito.mock(Stock.class));
-        mockCryptocurrencies = List.of(Mockito.mock(Cryptocurrency.class));
-        mockGroups = List.of(Mockito.mock(Group.class));
+        mockTransactions = List.of(Mockito.mock(Transaction.class));
+        mockPortfolioAssets = List.of(Mockito.mock(PortfolioAsset.class));
     }
 
     @Test
@@ -30,13 +28,12 @@ class PortfolioTest {
 
     @Test
     void testAllArgsConstructor() {
-        Portfolio portfolio = new Portfolio(1L, mockUser, mockStocks, mockCryptocurrencies, mockGroups);
+        Portfolio portfolio = new Portfolio(1L, mockUser, mockTransactions, mockPortfolioAssets);
 
         assertEquals(1L, portfolio.getId());
         assertEquals(mockUser, portfolio.getUser());
-        assertEquals(mockStocks, portfolio.getStocks());
-        assertEquals(mockCryptocurrencies, portfolio.getCryptocurrencies());
-        assertEquals(mockGroups, portfolio.getGroups());
+        assertEquals(mockTransactions, portfolio.getTransactions());
+        assertEquals(mockPortfolioAssets, portfolio.getPortfolioAssets());
     }
 
     @Test
@@ -45,14 +42,12 @@ class PortfolioTest {
 
         portfolio.setId(1L);
         portfolio.setUser(mockUser);
-        portfolio.setStocks(mockStocks);
-        portfolio.setCryptocurrencies(mockCryptocurrencies);
-        portfolio.setGroups(mockGroups);
+        portfolio.setTransactions(mockTransactions);
+        portfolio.setPortfolioAssets(mockPortfolioAssets);
 
         assertEquals(1L, portfolio.getId());
         assertEquals(mockUser, portfolio.getUser());
-        assertEquals(mockStocks, portfolio.getStocks());
-        assertEquals(mockCryptocurrencies, portfolio.getCryptocurrencies());
-        assertEquals(mockGroups, portfolio.getGroups());
+        assertEquals(mockTransactions, portfolio.getTransactions());
+        assertEquals(mockPortfolioAssets, portfolio.getPortfolioAssets());
     }
 }
