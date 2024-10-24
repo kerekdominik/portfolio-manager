@@ -1,21 +1,25 @@
 package com.portfolio.entity;
 
+import com.portfolio.entity.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
 
     private User user;
+    private Portfolio mockPortfolio;
 
     @BeforeEach
     void setUp() {
-        // Initialize a User instance before each test
         user = new User();
+        mockPortfolio = Mockito.mock(Portfolio.class);
     }
 
     @Test
@@ -33,7 +37,8 @@ class UserTest {
                 "password123",
                 "John",
                 "Doe",
-                Role.USER
+                Role.USER,
+                List.of(mockPortfolio)
         );
 
         assertEquals(1L, userAllArgs.getId());
@@ -43,6 +48,7 @@ class UserTest {
         assertEquals("John", userAllArgs.getFirstName());
         assertEquals("Doe", userAllArgs.getLastName());
         assertEquals(Role.USER, userAllArgs.getRole());
+        assertEquals(List.of(mockPortfolio), userAllArgs.getPortfolios());
     }
 
     @Test
@@ -54,6 +60,7 @@ class UserTest {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setRole(Role.USER);
+        user.setPortfolios(List.of(mockPortfolio));
 
         assertEquals(1L, user.getId());
         assertEquals("testUser", user.getUsername());
@@ -62,17 +69,18 @@ class UserTest {
         assertEquals("John", user.getFirstName());
         assertEquals("Doe", user.getLastName());
         assertEquals(Role.USER, user.getRole());
+        assertEquals(List.of(mockPortfolio), user.getPortfolios());
     }
 
     @Test
     void testGetAuthorities() {
-        user.setRole(Role.ADMIN);
+        user.setRole(Role.USER);
 
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
 
         assertNotNull(authorities);
         assertEquals(1, authorities.size());
-        //assertEquals("ADMIN", authorities.iterator().next().getAuthority());
+        assertEquals("USER", authorities.iterator().next().getAuthority());
     }
 
     @Test
@@ -105,6 +113,7 @@ class UserTest {
                 .firstName("Builder")
                 .lastName("User")
                 .role(Role.USER)
+                .portfolios(List.of(mockPortfolio))
                 .build();
 
         assertEquals(2L, userBuilder.getId());
@@ -114,38 +123,42 @@ class UserTest {
         assertEquals("Builder", userBuilder.getFirstName());
         assertEquals("User", userBuilder.getLastName());
         assertEquals(Role.USER, userBuilder.getRole());
+        assertEquals(List.of(mockPortfolio), userBuilder.getPortfolios());
     }
 
     @Test
     void testEqualsAndHashCode() {
         User user1 = new User(
                 1L,
+                "test@example.com",
                 "testUser",
                 "password123",
-                "test@example.com",
                 "John",
                 "Doe",
-                Role.USER
+                Role.USER,
+                List.of(mockPortfolio)
         );
 
         User user2 = new User(
                 1L,
+                "test@example.com",
                 "testUser",
                 "password123",
-                "test@example.com",
                 "John",
                 "Doe",
-                Role.USER
+                Role.USER,
+                List.of(mockPortfolio)
         );
 
         User user3 = new User(
                 2L,
+                "another@example.com",
                 "anotherUser",
                 "password456",
-                "another@example.com",
                 "Jane",
                 "Smith",
-                Role.ADMIN
+                Role.ADMIN,
+                List.of(mockPortfolio)
         );
 
         assertEquals(user1, user2);
@@ -163,6 +176,7 @@ class UserTest {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setRole(Role.USER);
+        user.setPortfolios(List.of(mockPortfolio));
 
         String toString = user.toString();
 
@@ -173,5 +187,6 @@ class UserTest {
         assertTrue(toString.contains("firstName=John"));
         assertTrue(toString.contains("lastName=Doe"));
         assertTrue(toString.contains("role=USER"));
+        assertTrue(toString.contains("portfolios"));
     }
 }

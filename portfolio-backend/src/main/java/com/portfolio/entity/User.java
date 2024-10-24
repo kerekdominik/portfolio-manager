@@ -1,5 +1,6 @@
 package com.portfolio.entity;
 
+import com.portfolio.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,6 +29,9 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private transient List<Portfolio> portfolios;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
