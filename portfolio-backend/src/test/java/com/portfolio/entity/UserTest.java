@@ -1,5 +1,6 @@
 package com.portfolio.entity;
 
+import com.portfolio.entity.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

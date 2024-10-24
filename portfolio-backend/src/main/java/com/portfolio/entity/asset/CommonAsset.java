@@ -1,6 +1,8 @@
 package com.portfolio.entity.asset;
 
+import com.portfolio.entity.Group;
 import com.portfolio.entity.Portfolio;
+import com.portfolio.entity.enums.AssetCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "common_asset")
 public abstract class CommonAsset {
     @Id
     private long id;
@@ -25,6 +28,13 @@ public abstract class CommonAsset {
 
     @ManyToOne
     private Portfolio portfolio;
+
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
+
+    @Enumerated(EnumType.STRING)
+    private AssetCategory category;
 
     private LocalDateTime purchaseDate;
 }

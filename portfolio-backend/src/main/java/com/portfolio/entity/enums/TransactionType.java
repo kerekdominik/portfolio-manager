@@ -1,4 +1,4 @@
-package com.portfolio.entity;
+package com.portfolio.entity.enums;
 
 public enum TransactionType {
     BUY,

@@ -1,6 +1,7 @@
 package com.portfolio.entity;
 
 import com.portfolio.entity.asset.CommonAsset;
+import com.portfolio.entity.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
