@@ -1,31 +1,27 @@
 package com.portfolio.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.portfolio.entity.asset.CommonAsset;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "\"group\"")
 public class Group {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
 
-    @ManyToOne
-    private Portfolio portfolio;
-
-    public Group() {
-
-    }
-
-    public Group(long id, String name, Portfolio portfolio) {
-        this.id = id;
-        this.name = name;
-        this.portfolio = portfolio;
-    }
+    @OneToMany(mappedBy = "group")
+    private List<CommonAsset> assets;
 }

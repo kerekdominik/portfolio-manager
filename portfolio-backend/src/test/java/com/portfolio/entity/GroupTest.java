@@ -1,16 +1,20 @@
 package com.portfolio.entity;
 
+import com.portfolio.entity.asset.CommonAsset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GroupTest {
-    private Portfolio mockPortfolio;
+    private CommonAsset mockAsset;
 
     @BeforeEach
     void setUp() {
-        mockPortfolio = org.mockito.Mockito.mock(Portfolio.class);
+        mockAsset = Mockito.mock(CommonAsset.class);
     }
 
     @Test
@@ -21,11 +25,11 @@ class GroupTest {
 
     @Test
     void testAllArgsConstructor() {
-        Group group = new Group(1L, "Tech", mockPortfolio);
+        Group group = new Group(1L, "Tech", List.of(mockAsset));
 
         assertEquals(1L, group.getId());
         assertEquals("Tech", group.getName());
-        assertEquals(mockPortfolio, group.getPortfolio());
+        assertEquals(List.of(mockAsset), group.getAssets());
     }
 
     @Test
@@ -34,10 +38,10 @@ class GroupTest {
 
         group.setId(1L);
         group.setName("Tech");
-        group.setPortfolio(mockPortfolio);
+        group.setAssets(List.of(mockAsset));
 
         assertEquals(1L, group.getId());
         assertEquals("Tech", group.getName());
-        assertEquals(mockPortfolio, group.getPortfolio());
+        assertEquals(List.of(mockAsset), group.getAssets());
     }
 }

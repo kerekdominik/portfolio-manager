@@ -28,7 +28,4 @@ public class Portfolio {
 
     @OneToMany(mappedBy = "portfolio")
     private List<PortfolioAsset> portfolioAssets;
-
-    @OneToMany(mappedBy = "portfolio")
-    private List<Group> groups;
 }

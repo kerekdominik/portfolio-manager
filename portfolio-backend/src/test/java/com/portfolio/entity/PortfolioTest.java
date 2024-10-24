@@ -12,14 +12,12 @@ class PortfolioTest {
     private User mockUser;
     private List<Transaction> mockTransactions;
     private List<PortfolioAsset> mockPortfolioAssets;
-    private List<Group> mockGroups;
 
     @BeforeEach
     void setUp() {
         mockUser = Mockito.mock(User.class);
         mockTransactions = List.of(Mockito.mock(Transaction.class));
         mockPortfolioAssets = List.of(Mockito.mock(PortfolioAsset.class));
-        mockGroups = List.of(Mockito.mock(Group.class));
     }
 
     @Test
@@ -30,13 +28,12 @@ class PortfolioTest {
 
     @Test
     void testAllArgsConstructor() {
-        Portfolio portfolio = new Portfolio(1L, mockUser, mockTransactions, mockPortfolioAssets, mockGroups);
+        Portfolio portfolio = new Portfolio(1L, mockUser, mockTransactions, mockPortfolioAssets);
 
         assertEquals(1L, portfolio.getId());
         assertEquals(mockUser, portfolio.getUser());
         assertEquals(mockTransactions, portfolio.getTransactions());
         assertEquals(mockPortfolioAssets, portfolio.getPortfolioAssets());
-        assertEquals(mockGroups, portfolio.getGroups());
     }
 
     @Test
@@ -47,12 +44,10 @@ class PortfolioTest {
         portfolio.setUser(mockUser);
         portfolio.setTransactions(mockTransactions);
         portfolio.setPortfolioAssets(mockPortfolioAssets);
-        portfolio.setGroups(mockGroups);
 
         assertEquals(1L, portfolio.getId());
         assertEquals(mockUser, portfolio.getUser());
         assertEquals(mockTransactions, portfolio.getTransactions());
         assertEquals(mockPortfolioAssets, portfolio.getPortfolioAssets());
-        assertEquals(mockGroups, portfolio.getGroups());
     }
 }

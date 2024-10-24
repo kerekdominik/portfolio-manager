@@ -1,5 +1,6 @@
 package com.portfolio.entity;
 
+import com.portfolio.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
