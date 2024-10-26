@@ -1,7 +1,7 @@
 package com.portfolio.configuration.security;
 
 import com.portfolio.dto.auth.AuthenticationResponseDto;
-import com.portfolio.service.OAuth2Service;
+import com.portfolio.service.impl.OAuth2Service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;

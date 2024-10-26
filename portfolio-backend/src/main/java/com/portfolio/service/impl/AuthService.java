@@ -1,4 +1,4 @@
-package com.portfolio.service;
+package com.portfolio.service.impl;
 
 import com.portfolio.dto.auth.AuthenticationResponseDto;
 import com.portfolio.dto.auth.LoginRequestDto;
