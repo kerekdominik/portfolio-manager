@@ -41,6 +41,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.boot:spring-boot-starter-cache")
 
 	/** Imported and managed manually **/
 	implementation(libs.springdoc.openapi.starter.webmvc.ui)
@@ -48,6 +49,7 @@ dependencies {
 	implementation(libs.jjwt.impl)
 	implementation(libs.jjwt.jackson)
 	implementation(libs.mapstruct)
+	implementation(libs.caffeine)
 	/**********************************/
 
 	runtimeOnly("org.postgresql:postgresql")
