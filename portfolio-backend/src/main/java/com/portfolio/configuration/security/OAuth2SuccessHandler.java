@@ -1,7 +1,7 @@
 package com.portfolio.configuration.security;
 
 import com.portfolio.dto.auth.AuthenticationResponseDto;
-import com.portfolio.service.OAuth2Service;
+import com.portfolio.service.impl.OAuth2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;

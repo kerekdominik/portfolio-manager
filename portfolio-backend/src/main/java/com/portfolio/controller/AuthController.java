@@ -3,7 +3,7 @@ package com.portfolio.controller;
 import com.portfolio.dto.auth.AuthenticationResponseDto;
 import com.portfolio.dto.auth.LoginRequestDto;
 import com.portfolio.dto.auth.RegisterRequestDto;
-import com.portfolio.service.AuthService;
+import com.portfolio.service.impl.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
