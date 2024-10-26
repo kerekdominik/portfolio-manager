@@ -1,6 +1,6 @@
 package com.portfolio.configuration.security;
 
-import com.portfolio.service.JwtService;
+import com.portfolio.service.impl.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
