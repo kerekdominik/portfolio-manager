@@ -1,0 +1,25 @@
+/* daily-prices.component.css */
+.price-cards {
+  display: flex;
+  justify-content: space-around; /* Kártyák közötti távolság */
+  gap: 20px;                     /* Távolság a kártyák között */
+  flex-wrap: wrap;               /* Törés, ha a hely nem elegendő */
+}
+
+.price-card {
+  width: 200px;                  /* Kisebb, fix szélesség a kártyáknak */
+  text-align: center;
+}
+
+.crypto-logo {
+  width: 30px;                   /* Logók méretének beállítása */
+  height: 30px;
+  margin-right: 8px;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+}
