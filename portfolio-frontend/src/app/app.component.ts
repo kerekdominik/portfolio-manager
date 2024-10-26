@@ -3,25 +3,14 @@ import {RouterLink, RouterOutlet} from '@angular/router';
 import {MatToolbar} from '@angular/material/toolbar';
 import {MatButton} from '@angular/material/button';
 import {NgIf} from '@angular/common';
-import {AuthService} from './services/auth.service';
+import {MenuComponent} from './shared/components/menu/menu.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MatToolbar, MatButton, RouterLink, NgIf],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  imports: [RouterOutlet, MatToolbar, MatButton, RouterLink, NgIf, MenuComponent],
+  templateUrl: './app.component.html'
 })
 export class AppComponent {
   title = 'portfolio-frontend';
-
-  constructor(private readonly authService: AuthService) {}
-
-  isAuthenticated() {
-    return this.authService.isAuthenticated();
-  }
-
-  logout() {
-    this.authService.logout();
-  }
 }

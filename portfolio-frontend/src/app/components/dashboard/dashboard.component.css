@@ -1,0 +1,29 @@
+.dashboard-container {
+  width: 90%;
+  /* Centers the dashboard horizontally */
+  margin: 100px auto 0;
+}
+
+.left-section {
+  /*border: black 1px  solid;*/
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right-top-section {
+  /*border: black 1px  solid;*/
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right-bottom-section {
+  /*border: black 1px  solid;*/
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
