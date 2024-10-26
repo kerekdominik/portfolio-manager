@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import {NgOptimizedImage} from '@angular/common';
-import {User, UserService} from '../../services/user.service';
+import {User, UserService} from '../../core/services/user.service';
 
 @Component({
   selector: 'app-profile',
