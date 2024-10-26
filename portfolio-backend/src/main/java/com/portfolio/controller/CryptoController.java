@@ -1,6 +1,7 @@
 package com.portfolio.controller;
 
 import com.portfolio.external.api.crypto.CurrentCryptoResponse;
+import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
 import com.portfolio.service.CryptoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,27 @@ public class CryptoController {
             return ResponseEntity.status(500).body("Request interrupted: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/historical/price")
+    public ResponseEntity<?> getHistoricalPrice(@RequestParam String id, @RequestParam String date) {
+        try {
+            HistoricalCryptoResponse historicalCryptoResponse = cryptoService.getHistoricalPrice(id.toLowerCase(), date);
+            Double price = historicalCryptoResponse.getMarketData().getPriceInUSD();
+
+            if (price != null) {
+                return ResponseEntity.ok(price);
+            } else {
+                return ResponseEntity.status(404).body("Historical price not found for cryptocurrency: " + id + " on date: " + date);
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Error fetching historical price: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return ResponseEntity.status(500).body("Request interrupted: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 }
