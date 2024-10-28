@@ -1,1 +1,25 @@
-<p>portfolio works!</p>
+<div class="portfolio-container">
+  <!-- Custom Groups -->
+  <mat-card class="groups-card">
+    <mat-card-title>Custom Groups</mat-card-title>
+    <app-groups-table></app-groups-table>
+  </mat-card>
+
+  <mat-grid-list cols="2" rowHeight="1:1">
+    <!-- Cryptos -->
+    <mat-grid-tile class="crypto-tile">
+      <mat-card>
+        <mat-card-title>Cryptos</mat-card-title>
+        <app-crypto-table class="crypto-table"></app-crypto-table>
+      </mat-card>
+    </mat-grid-tile>
+
+    <!-- Stocks -->
+    <mat-grid-tile class="stock-tile">
+      <mat-card>
+        <mat-card-title>Stocks</mat-card-title>
+        <app-stock-table class="stock-table"></app-stock-table>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>
