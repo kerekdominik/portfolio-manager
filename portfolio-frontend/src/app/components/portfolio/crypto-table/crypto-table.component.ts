@@ -9,7 +9,7 @@ import {
   MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
   MatTable
 } from '@angular/material/table';
-import {MatIconButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {CurrencyPipe} from '@angular/common';
 import {EditItemDialogComponent} from '../edit-item-dialog/edit-item-dialog.component';
@@ -30,7 +30,8 @@ import {EditItemDialogComponent} from '../edit-item-dialog/edit-item-dialog.comp
     MatRowDef,
     MatRow,
     MatHeaderRowDef,
-    CurrencyPipe
+    CurrencyPipe,
+    MatButton
   ],
   templateUrl: './crypto-table.component.html',
   styleUrl: './crypto-table.component.css'
@@ -47,7 +48,10 @@ export class CryptoTableComponent {
   openEditDialog(element: any): void {
     const dialogRef = this.dialog.open(EditItemDialogComponent, {
       width: '300px',
-      data: { ...element }
+      data: {
+        ...element,
+        fields: ['name', 'price', 'quantity', 'group']
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -63,5 +67,25 @@ export class CryptoTableComponent {
 
   delete(element: any): void {
     this.dataSource = this.dataSource.filter(item => item.name !== element.name);
+  }
+
+  openAddDialog() {
+    const dialogRef = this.dialog.open(EditItemDialogComponent, {
+      width: '300px',
+      data: {
+        name: '',
+        price: 0,
+        currentPrice: 0,
+        quantity: 0,
+        group: '',
+        fields: ['name', 'price', 'quantity', 'group']
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.dataSource = [...this.dataSource, result];
+      }
+    });
   }
 }

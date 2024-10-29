@@ -11,7 +11,7 @@ import {MatInput} from '@angular/material/input';
 import {FormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {MatOption, MatSelect} from '@angular/material/select';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-edit-item-dialog',
@@ -27,7 +27,8 @@ import {NgForOf} from '@angular/common';
     MatLabel,
     MatSelect,
     MatOption,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './edit-item-dialog.component.html',
   styleUrl: './edit-item-dialog.component.css'
@@ -49,5 +50,9 @@ export class EditItemDialogComponent {
 
   onSave(): void {
     this.dialogRef.close(this.tempData); //TODO: review saving
+  }
+
+  isFieldVisible(field: string): boolean {
+    return this.data.fields.includes(field);
   }
 }
