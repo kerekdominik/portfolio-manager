@@ -9,9 +9,19 @@
     <mat-cell *matCellDef="let element"> {{ element.price | currency:'USD' }} </mat-cell>
   </ng-container>
 
+  <ng-container matColumnDef="currentPrice">
+    <mat-header-cell *matHeaderCellDef> Current Price </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.currentPrice | currency:'USD' }} </mat-cell>
+  </ng-container>
+
   <ng-container matColumnDef="quantity">
     <mat-header-cell *matHeaderCellDef> Quantity </mat-header-cell>
     <mat-cell *matCellDef="let element"> {{ element.quantity }} </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="group">
+    <mat-header-cell *matHeaderCellDef> Group </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.group }} </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="actions">

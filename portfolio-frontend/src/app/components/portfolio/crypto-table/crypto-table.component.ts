@@ -12,6 +12,7 @@ import {
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {CurrencyPipe} from '@angular/common';
+import {EditItemDialogComponent} from '../edit-item-dialog/edit-item-dialog.component';
 
 @Component({
   selector: 'app-crypto-table',
@@ -35,22 +36,32 @@ import {CurrencyPipe} from '@angular/common';
   styleUrl: './crypto-table.component.css'
 })
 export class CryptoTableComponent {
-  displayedColumns: string[] = ['name', 'price', 'quantity', 'actions'];
+  displayedColumns: string[] = ['name', 'price', 'currentPrice', 'quantity', 'group', 'actions'];
   dataSource = [
-    { name: 'Bitcoin', price: 50000, quantity: 2 },
-    { name: 'Ethereum', price: 4000, quantity: 5 }
+    { name: 'Bitcoin', price: 50000, currentPrice: 51000, quantity: 2, group: 'Top Cryptos' },
+    { name: 'Ethereum', price: 4000, currentPrice: 4200, quantity: 5, group: 'Altcoins' }
   ];
 
   constructor(public dialog: MatDialog) {}
 
   openEditDialog(element: any): void {
-    /*const dialogRef = this.dialog.open(EditCryptoDialogComponent, { data: element });
+    const dialogRef = this.dialog.open(EditItemDialogComponent, {
+      width: '300px',
+      data: { ...element }
+    });
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        const index = this.dataSource.findIndex(item => item.name === element.name);
+        if (index > -1) {
+          this.dataSource[index] = result;
+          this.dataSource = [...this.dataSource];
+        }
       }
-    });*/
+    });
   }
 
   delete(element: any): void {
+    this.dataSource = this.dataSource.filter(item => item.name !== element.name);
   }
 }
