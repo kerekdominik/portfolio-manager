@@ -1,18 +1,17 @@
-/* daily-prices.component.css */
 .price-cards {
   display: flex;
-  justify-content: space-around; /* Kártyák közötti távolság */
-  gap: 20px;                     /* Távolság a kártyák között */
-  flex-wrap: wrap;               /* Törés, ha a hely nem elegendő */
+  justify-content: space-around;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .price-card {
-  width: 200px;                  /* Kisebb, fix szélesség a kártyáknak */
+  width: 200px;
   text-align: center;
 }
 
 .crypto-logo {
-  width: 30px;                   /* Logók méretének beállítása */
+  width: 30px;
   height: 30px;
   margin-right: 8px;
 }
