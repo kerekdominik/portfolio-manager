@@ -1,3 +1,6 @@
+<div class="table-header">
+  <button mat-raised-button color="primary" (click)="openAddDialog()">+ Add New</button>
+</div>
 <mat-table [dataSource]="dataSource" class="crypto-table">
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
