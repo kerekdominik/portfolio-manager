@@ -2,7 +2,6 @@ package com.portfolio.entity.asset;
 
 import com.portfolio.entity.Group;
 import com.portfolio.entity.Portfolio;
-import com.portfolio.entity.enums.AssetCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +24,7 @@ public abstract class CommonAsset {
     private String name;
     private double priceWhenBought;
     private double priceNow;
+    private double quantity;
 
     @ManyToOne
     private Portfolio portfolio;
@@ -32,9 +32,6 @@ public abstract class CommonAsset {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
-
-    @Enumerated(EnumType.STRING)
-    private AssetCategory category;
 
     private LocalDateTime purchaseDate;
 }
