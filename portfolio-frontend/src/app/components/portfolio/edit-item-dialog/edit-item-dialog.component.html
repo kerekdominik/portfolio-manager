@@ -1,0 +1,36 @@
+<h1 mat-dialog-title>Edit Item</h1>
+<form (ngSubmit)="onSave()">
+  <div mat-dialog-content>
+    <mat-form-field *ngIf="isFieldVisible('name')">
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="tempData.name" name="name" />
+    </mat-form-field>
+
+    <mat-form-field *ngIf="isFieldVisible('price')">
+      <mat-label>Price</mat-label>
+      <input matInput type="number" [(ngModel)]="tempData.price" name="price" />
+    </mat-form-field>
+
+    <mat-form-field *ngIf="isFieldVisible('quantity')">
+      <mat-label>Quantity</mat-label>
+      <input matInput type="number" [(ngModel)]="tempData.quantity" name="quantity" />
+    </mat-form-field>
+
+    <mat-form-field *ngIf="isFieldVisible('group')">
+      <mat-label>Group</mat-label>
+      <mat-select [(ngModel)]="tempData.group" name="group">
+        <mat-option *ngFor="let group of groups" [value]="group">{{ group }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field *ngIf="isFieldVisible('type')">
+      <mat-label>Type</mat-label>
+      <input matInput [(ngModel)]="tempData.type" name="type" />
+    </mat-form-field>
+  </div>
+
+  <div mat-dialog-actions>
+    <button mat-button type="button" (click)="onCancel()">Cancel</button>
+    <button mat-button color="primary" type="submit">Save</button>
+  </div>
+</form>
