@@ -1,7 +1,7 @@
 package com.portfolio.controller;
 
 import com.portfolio.entity.asset.Crypto;
-import com.portfolio.entity.asset.CryptoListItem;
+import com.portfolio.entity.asset.external.CryptoListItem;
 import com.portfolio.external.api.crypto.CurrentCryptoResponse;
 import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
 import com.portfolio.repository.CryptoListRepository;
