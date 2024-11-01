@@ -18,4 +18,8 @@ export class CryptoPriceService {
   getOneYearAgoPrice(id: string, date: string): Observable<number> {
     return this.http.get<number>(`${this.baseUrl}/crypto/historical/price?id=${id}&date=${date}`);
   }
+
+  getAllCryptoNames(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/crypto/list`);
+  }
 }
