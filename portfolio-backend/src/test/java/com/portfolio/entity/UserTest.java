@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +37,7 @@ class UserTest {
                 "John",
                 "Doe",
                 Role.USER,
-                List.of(mockPortfolio)
+                mockPortfolio
         );
 
         assertEquals(1L, userAllArgs.getId());
@@ -48,7 +47,7 @@ class UserTest {
         assertEquals("John", userAllArgs.getFirstName());
         assertEquals("Doe", userAllArgs.getLastName());
         assertEquals(Role.USER, userAllArgs.getRole());
-        assertEquals(List.of(mockPortfolio), userAllArgs.getPortfolios());
+        assertEquals(mockPortfolio, userAllArgs.getPortfolio());
     }
 
     @Test
@@ -60,7 +59,7 @@ class UserTest {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setRole(Role.USER);
-        user.setPortfolios(List.of(mockPortfolio));
+        user.setPortfolio(mockPortfolio);
 
         assertEquals(1L, user.getId());
         assertEquals("testUser", user.getUsername());
@@ -69,7 +68,7 @@ class UserTest {
         assertEquals("John", user.getFirstName());
         assertEquals("Doe", user.getLastName());
         assertEquals(Role.USER, user.getRole());
-        assertEquals(List.of(mockPortfolio), user.getPortfolios());
+        assertEquals(mockPortfolio, user.getPortfolio());
     }
 
     @Test
@@ -113,7 +112,7 @@ class UserTest {
                 .firstName("Builder")
                 .lastName("User")
                 .role(Role.USER)
-                .portfolios(List.of(mockPortfolio))
+                .portfolio(mockPortfolio)
                 .build();
 
         assertEquals(2L, userBuilder.getId());
@@ -123,7 +122,7 @@ class UserTest {
         assertEquals("Builder", userBuilder.getFirstName());
         assertEquals("User", userBuilder.getLastName());
         assertEquals(Role.USER, userBuilder.getRole());
-        assertEquals(List.of(mockPortfolio), userBuilder.getPortfolios());
+        assertEquals(mockPortfolio, userBuilder.getPortfolio());
     }
 
     @Test
@@ -136,7 +135,7 @@ class UserTest {
                 "John",
                 "Doe",
                 Role.USER,
-                List.of(mockPortfolio)
+                mockPortfolio
         );
 
         User user2 = new User(
@@ -147,7 +146,7 @@ class UserTest {
                 "John",
                 "Doe",
                 Role.USER,
-                List.of(mockPortfolio)
+                mockPortfolio
         );
 
         User user3 = new User(
@@ -158,7 +157,7 @@ class UserTest {
                 "Jane",
                 "Smith",
                 Role.ADMIN,
-                List.of(mockPortfolio)
+                mockPortfolio
         );
 
         assertEquals(user1, user2);
@@ -176,7 +175,7 @@ class UserTest {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setRole(Role.USER);
-        user.setPortfolios(List.of(mockPortfolio));
+        user.setPortfolio(mockPortfolio);
 
         String toString = user.toString();
 
@@ -187,6 +186,6 @@ class UserTest {
         assertTrue(toString.contains("firstName=John"));
         assertTrue(toString.contains("lastName=Doe"));
         assertTrue(toString.contains("role=USER"));
-        assertTrue(toString.contains("portfolios"));
+        assertTrue(toString.contains("portfolio"));
     }
 }
