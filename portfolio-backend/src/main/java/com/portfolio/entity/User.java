@@ -30,8 +30,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private transient List<Portfolio> portfolios;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Portfolio portfolio; // for now, one user has one portfolio
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
