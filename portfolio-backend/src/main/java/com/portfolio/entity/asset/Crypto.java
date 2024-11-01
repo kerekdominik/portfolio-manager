@@ -12,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "cryptocurrency")
 public class Crypto extends CommonAsset {
-    @Enumerated(EnumType.STRING)
-    private AssetCategory category = AssetCategory.CRYPTOCURRENCY;
+    {
+        this.setAssetCategory(AssetCategory.CRYPTOCURRENCY);
+    }
 }

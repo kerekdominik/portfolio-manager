@@ -1,4 +1,4 @@
-package com.portfolio.entity.asset;
+package com.portfolio.entity.asset.external;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
