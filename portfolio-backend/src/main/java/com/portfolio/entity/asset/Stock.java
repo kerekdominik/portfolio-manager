@@ -13,7 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "stock")
 public class Stock extends CommonAsset {
-    {
+
+    public Stock(String name, String symbol) {
+        super(name, symbol);
         this.setAssetCategory(AssetCategory.STOCK);
     }
 }

@@ -12,7 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "cryptocurrency")
 public class Crypto extends CommonAsset {
-    {
+
+    public Crypto(String name, String symbol) {
+        super(name, symbol);
         this.setAssetCategory(AssetCategory.CRYPTOCURRENCY);
     }
 }
