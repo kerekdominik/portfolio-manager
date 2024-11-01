@@ -1,6 +1,5 @@
 package com.portfolio.entity;
 
-import com.portfolio.entity.asset.CommonAsset;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +21,17 @@ public class Group {
 
     private String name;
 
-    @OneToMany(mappedBy = "group")
-    private List<CommonAsset> assets;
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PortfolioAsset> assets;
+
+    // Helper method to manage bidirectional relationship
+    public void addAsset(PortfolioAsset asset) {
+        assets.add(asset);
+        asset.setGroup(this);
+    }
+
+    public void removeAsset(PortfolioAsset asset) {
+        assets.remove(asset);
+        asset.setGroup(null);
+    }
 }

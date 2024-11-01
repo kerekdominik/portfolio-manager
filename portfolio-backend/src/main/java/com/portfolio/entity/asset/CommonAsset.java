@@ -1,6 +1,5 @@
 package com.portfolio.entity.asset;
 
-import com.portfolio.entity.Group;
 import com.portfolio.entity.Portfolio;
 import com.portfolio.entity.enums.AssetCategory;
 import jakarta.persistence.*;
@@ -30,13 +29,14 @@ public abstract class CommonAsset {
     @ManyToOne
     private Portfolio portfolio;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
-
     private LocalDateTime purchaseDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AssetCategory assetCategory;
+
+    protected CommonAsset(String name, String symbol) {
+        this.name = name;
+        this.symbol = symbol;
+    }
 }
