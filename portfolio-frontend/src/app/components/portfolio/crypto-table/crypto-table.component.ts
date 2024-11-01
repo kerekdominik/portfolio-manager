@@ -13,6 +13,7 @@ import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {CurrencyPipe} from '@angular/common';
 import {EditItemDialogComponent} from '../edit-item-dialog/edit-item-dialog.component';
+import {CryptoPriceService} from '../../services/crypto-price.service';
 
 @Component({
   selector: 'app-crypto-table',
@@ -41,9 +42,17 @@ export class CryptoTableComponent {
   dataSource = [
     { name: 'Bitcoin', price: 50000, currentPrice: 51000, quantity: 2, group: 'Top Cryptos' },
     { name: 'Ethereum', price: 4000, currentPrice: 4200, quantity: 5, group: 'Altcoins' }
-  ];
+  ]
 
-  constructor(public dialog: MatDialog) {}
+  cryptoNames: string[] = [];
+
+  constructor(public dialog: MatDialog, public cryptoService: CryptoPriceService) {}
+
+  ngOnInit(): void {
+    this.cryptoService.getAllCryptoNames().subscribe(names => {
+      this.cryptoNames = names;
+    });
+  }
 
   openEditDialog(element: any): void {
     const dialogRef = this.dialog.open(EditItemDialogComponent, {
@@ -78,7 +87,8 @@ export class CryptoTableComponent {
         currentPrice: 0,
         quantity: 0,
         group: '',
-        fields: ['name', 'price', 'quantity', 'group']
+        fields: ['name', 'price', 'quantity', 'group'],
+        cryptoNames: this.cryptoNames
       }
     });
 
