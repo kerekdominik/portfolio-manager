@@ -2,8 +2,18 @@
 <form (ngSubmit)="onSave()">
   <div mat-dialog-content>
     <mat-form-field *ngIf="isFieldVisible('name')">
-      <mat-label>Name</mat-label>
-      <input matInput [(ngModel)]="tempData.name" name="name" />
+      <mat-label>Cryptocurrency Name</mat-label>
+      <input
+        matInput
+        [formControl]="cryptoControl"
+        [matAutocomplete]="auto"
+        placeholder="Start typing to filter..."
+      />
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let crypto of filteredCryptoNames | async" [value]="crypto">
+          {{ crypto }}
+        </mat-option>
+      </mat-autocomplete>
     </mat-form-field>
 
     <mat-form-field *ngIf="isFieldVisible('price')">
