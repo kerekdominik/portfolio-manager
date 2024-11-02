@@ -5,7 +5,6 @@ import com.portfolio.dto.GroupResponseDto;
 import com.portfolio.entity.Group;
 import com.portfolio.entity.User;
 import com.portfolio.repository.GroupRepository;
-import com.portfolio.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
