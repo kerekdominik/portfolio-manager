@@ -129,7 +129,6 @@ public class CryptoServiceImpl implements CryptoService {
                     existingCrypto.setPriceWhenBought(crypto.getPriceWhenBought());
                     existingCrypto.setPriceNow(crypto.getPriceNow());
                     existingCrypto.setQuantity(crypto.getQuantity());
-                    existingCrypto.setGroup(crypto.getGroup());
                     return cryptoRepository.save(existingCrypto);
                 })
                 .orElseThrow(() -> new RuntimeException("Crypto not found with id: " + id));

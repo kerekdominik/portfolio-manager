@@ -28,7 +28,9 @@ public class PortfolioAsset {
     @JoinColumn(name = "asset_id")
     private CommonAsset asset;
 
-    private double quantity;
-    private double averagePrice;
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
+
     private LocalDateTime purchaseDate;
 }

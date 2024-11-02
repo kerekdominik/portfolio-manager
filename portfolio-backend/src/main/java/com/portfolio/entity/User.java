@@ -31,7 +31,7 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Portfolio portfolio; // for now, one user has one portfolio
+    private transient Portfolio portfolio; // for now, one user has one portfolio
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
