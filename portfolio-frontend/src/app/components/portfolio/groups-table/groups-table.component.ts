@@ -12,6 +12,7 @@ import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {EditItemDialogComponent} from '../edit-item-dialog/edit-item-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
+import {AddGroupComponent} from './add-group/add-group.component';
 
 @Component({
   selector: 'app-groups-table',
@@ -44,6 +45,18 @@ export class GroupsTableComponent {
   constructor(public dialog: MatDialog) {
   }
 
+  openAddDialog(): void {
+    const dialogRef = this.dialog.open(AddGroupComponent, {
+      width: '300px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.dataSource = [...this.dataSource, result];
+      }
+    });
+  }
+
   openEditDialog(element: any): void {
     const dialogRef = this.dialog.open(EditItemDialogComponent, {
       width: '300px',
@@ -70,22 +83,5 @@ export class GroupsTableComponent {
       this.dataSource.splice(index, 1);
       this.dataSource = [...this.dataSource];
     }
-  }
-
-  openAddDialog(): void {
-    const dialogRef = this.dialog.open(EditItemDialogComponent, {
-      width: '300px',
-      data: {
-        name: '',
-        type: '',
-        fields: ['name', 'type']
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.dataSource = [...this.dataSource, result];
-      }
-    });
   }
 }
