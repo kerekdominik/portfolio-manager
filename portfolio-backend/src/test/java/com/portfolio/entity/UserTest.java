@@ -37,7 +37,8 @@ class UserTest {
                 "John",
                 "Doe",
                 Role.USER,
-                mockPortfolio
+                mockPortfolio,
+                null // Groups initialized as null in constructor
         );
 
         assertEquals(1L, userAllArgs.getId());
@@ -135,7 +136,8 @@ class UserTest {
                 "John",
                 "Doe",
                 Role.USER,
-                mockPortfolio
+                mockPortfolio,
+                null
         );
 
         User user2 = new User(
@@ -146,7 +148,8 @@ class UserTest {
                 "John",
                 "Doe",
                 Role.USER,
-                mockPortfolio
+                mockPortfolio,
+                null
         );
 
         User user3 = new User(
@@ -157,7 +160,8 @@ class UserTest {
                 "Jane",
                 "Smith",
                 Role.ADMIN,
-                mockPortfolio
+                mockPortfolio,
+                null
         );
 
         assertEquals(user1, user2);

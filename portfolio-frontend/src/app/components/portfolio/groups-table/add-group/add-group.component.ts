@@ -1,10 +1,17 @@
-import { Component } from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {GroupService} from '../../../services/group-services.service';
 import {FormsModule} from '@angular/forms';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
-import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle
+} from '@angular/material/dialog';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-add-group',
@@ -17,35 +24,53 @@ import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '
     MatLabel,
     MatDialogTitle,
     MatDialogContent,
-    MatDialogActions
+    MatDialogActions,
+    NgIf
   ],
   templateUrl: './add-group.component.html',
   styleUrl: './add-group.component.css'
 })
 export class AddGroupComponent {
   groupName: string = '';
+  isEditMode: boolean = false;
+  groupId?: number;
 
   constructor(
     private readonly groupService: GroupService,
-    private readonly dialogRef: MatDialogRef<AddGroupComponent>
-  ) {}
+    private readonly dialogRef: MatDialogRef<AddGroupComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    if (data) {
+      this.isEditMode = true;
+      this.groupName = data.name;
+      this.groupId = data.id;
+    }
+  }
 
-  addGroup() {
-    if (this.groupName.trim()) {
-      const newGroup = this.groupName;
-
-      this.groupService.createGroup(newGroup).subscribe({
-        next: (response) => {
-          this.dialogRef.close(response);
-        },
-        error: (error) => {
-          console.error('Error creating group:', error);
-        }
+  saveGroup() {
+    if (this.isEditMode && this.groupId != null) {
+      this.groupService.updateGroup(this.groupId, this.groupName).subscribe({
+        next: () => this.dialogRef.close({ name: this.groupName, id: this.groupId }),
+        error: (error) => console.error('Error updating group:', error)
+      });
+    } else {
+      this.groupService.createGroup(this.groupName).subscribe({
+        next: (createdGroup) => this.dialogRef.close(createdGroup),
+        error: (error) => console.error('Error creating group:', error)
       });
     }
   }
 
-  onCancel() {
+  deleteGroup() {
+    if (this.groupId != null) {
+      this.groupService.deleteGroup(this.groupId).subscribe({
+        next: () => this.dialogRef.close({ delete: true, id: this.groupId }),
+        error: (error) => console.error('Error deleting group:', error)
+      });
+    }
+  }
 
+  onCancel(): void {
+    this.dialogRef.close();
   }
 }
