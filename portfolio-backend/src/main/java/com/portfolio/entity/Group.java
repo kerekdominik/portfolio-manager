@@ -21,6 +21,10 @@ public class Group {
 
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PortfolioAsset> assets;
 
@@ -33,5 +37,11 @@ public class Group {
     public void removeAsset(PortfolioAsset asset) {
         assets.remove(asset);
         asset.setGroup(null);
+    }
+
+    // Constructor for creating a group with a user
+    public Group(String name, User user) {
+        this.name = name;
+        this.user = user;
     }
 }

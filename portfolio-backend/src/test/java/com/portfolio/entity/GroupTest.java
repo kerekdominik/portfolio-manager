@@ -15,11 +15,13 @@ class GroupTest {
 
     private Group group;
     private PortfolioAsset mockPortfolioAsset;
+    private User mockUser;
 
     @BeforeEach
     void setUp() {
         group = new Group();
         mockPortfolioAsset = Mockito.mock(PortfolioAsset.class);
+        mockUser = Mockito.mock(User.class);
     }
 
     @Test
@@ -30,22 +32,25 @@ class GroupTest {
 
     @Test
     void testAllArgsConstructor() {
-        Group groupWithArgs = new Group(1L, "Tech", new ArrayList<>(List.of(mockPortfolioAsset)));
+        group = new Group(1L, "Tech", mockUser, new ArrayList<>(List.of(mockPortfolioAsset)));
 
-        assertEquals(1L, groupWithArgs.getId());
-        assertEquals("Tech", groupWithArgs.getName());
-        assertEquals(1, groupWithArgs.getAssets().size());
-        assertEquals(mockPortfolioAsset, groupWithArgs.getAssets().get(0));
+        assertEquals(1L, group.getId());
+        assertEquals("Tech", group.getName());
+        assertEquals(mockUser, group.getUser());
+        assertEquals(1, group.getAssets().size());
+        assertEquals(mockPortfolioAsset, group.getAssets().get(0));
     }
 
     @Test
     void testSettersAndGetters() {
         group.setId(1L);
         group.setName("Tech");
+        group.setUser(mockUser);
         group.setAssets(new ArrayList<>(List.of(mockPortfolioAsset)));
 
         assertEquals(1L, group.getId());
         assertEquals("Tech", group.getName());
+        assertEquals(mockUser, group.getUser());
         assertEquals(1, group.getAssets().size());
         assertEquals(mockPortfolioAsset, group.getAssets().get(0));
     }

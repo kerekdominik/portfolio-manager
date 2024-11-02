@@ -10,9 +10,9 @@ import {
 } from '@angular/material/table';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
-import {EditItemDialogComponent} from '../edit-item-dialog/edit-item-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {AddGroupComponent} from './add-group/add-group.component';
+import {Group, GroupService} from '../../services/group-services.service';
 
 @Component({
   selector: 'app-groups-table',
@@ -36,52 +36,62 @@ import {AddGroupComponent} from './add-group/add-group.component';
   styleUrl: './groups-table.component.css'
 })
 export class GroupsTableComponent {
-  displayedColumns: string[] = ['name', 'type', 'actions'];
-  dataSource = [
-    { name: 'Tech Stocks', type: 'Stock' },
-    { name: 'Top Cryptos', type: 'Crypto' }
-  ];
+  displayedColumns: string[] = ['name', 'actions'];
+  dataSource: Group[] = [];
 
-  constructor(public dialog: MatDialog) {
+  constructor(
+    public dialog: MatDialog,
+    private readonly groupService: GroupService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadGroups();
+  }
+
+  loadGroups(): void {
+    this.groupService.getAllGroups().subscribe({
+      next: (groups) => {
+        this.dataSource = groups;
+      },
+      error: (error) => {
+        console.error("Error fetching groups:", error);
+      }
+    });
   }
 
   openAddDialog(): void {
     const dialogRef = this.dialog.open(AddGroupComponent, {
-      width: '300px'
+      width: '400px'
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.dataSource = [...this.dataSource, result];
+        this.loadGroups(); // Reload groups after adding a new one
       }
     });
   }
 
-  openEditDialog(element: any): void {
-    const dialogRef = this.dialog.open(EditItemDialogComponent, {
-      width: '300px',
-      data: {
-        ...element,
-        fields: ['name', 'type']
-      }
+  openEditDialog(element: Group): void {
+    const dialogRef = this.dialog.open(AddGroupComponent, {
+      width: '400px',
+      data: { id: element.id, name: element.name }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const index = this.dataSource.findIndex(item => item.name === element.name);
-        if (index > -1) {
-          this.dataSource[index] = result;
-          this.dataSource = [...this.dataSource];
-        }
+        this.loadGroups(); // Reload groups after editing
       }
     });
   }
 
-  delete(element: any): void {
-    const index = this.dataSource.findIndex(item => item.name === element.name);
-    if (index > -1) {
-      this.dataSource.splice(index, 1);
-      this.dataSource = [...this.dataSource];
-    }
+  delete(element: Group): void {
+    this.groupService.deleteGroup(element.id).subscribe({
+      next: () => {
+        this.loadGroups(); // Reload groups after deleting
+      },
+      error: (error) => {
+        console.error("Error deleting group:", error);
+      }
+    });
   }
 }
