@@ -9,7 +9,7 @@ import {environment} from '../../../environments/envrionment.dev';
 export class CryptoPriceService {
   private readonly baseUrl = environment.apiBaseUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly http: HttpClient) { }
 
   getCurrentPrice(id: string): Observable<number> {
     return this.http.get<number>(`${this.baseUrl}/crypto/current/price?id=${id}`);
