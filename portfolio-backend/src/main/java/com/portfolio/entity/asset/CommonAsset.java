@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
@@ -22,14 +20,9 @@ public abstract class CommonAsset {
     private long id;
     private String symbol;
     private String name;
-    private double priceWhenBought;
-    private double priceNow;
-    private double quantity;
 
     @ManyToOne
     private Portfolio portfolio;
-
-    private LocalDateTime purchaseDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

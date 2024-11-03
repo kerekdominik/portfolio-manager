@@ -32,5 +32,8 @@ public class PortfolioAsset {
     @JoinColumn(name = "group_id")
     private Group group;
 
+    private double quantity;
     private LocalDateTime purchaseDate;
+    private double priceWhenBought;
+    private double priceNow;
 }
