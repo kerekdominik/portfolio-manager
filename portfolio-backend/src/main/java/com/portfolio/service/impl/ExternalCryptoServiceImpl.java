@@ -8,7 +8,7 @@ import com.portfolio.external.api.crypto.CurrentCryptoResponse;
 import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
 import com.portfolio.repository.CryptoListRepository;
 import com.portfolio.repository.CryptoRepository;
-import com.portfolio.service.CryptoService;
+import com.portfolio.service.ExternalCryptoService;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class CryptoServiceImpl implements CryptoService {
+public class ExternalCryptoServiceImpl implements ExternalCryptoService {
 
     private final CryptoRepository cryptoRepository;
     private final CryptoListRepository cryptoListRepository;
@@ -104,39 +104,6 @@ public class CryptoServiceImpl implements CryptoService {
         }
 
         return objectMapper.readValue(response.body(), HistoricalCryptoResponse.class);
-    }
-
-    @Override
-    public List<Crypto> getCryptosByUserId(Long userId) {
-        return cryptoRepository.findAllById(userId);
-    }
-
-    @Override
-    public Optional<Crypto> getCryptoById(Long id) {
-        return cryptoRepository.findById(id);
-    }
-
-    @Override
-    public Crypto saveCrypto(Crypto crypto) {
-        return cryptoRepository.save(crypto);
-    }
-
-    @Override
-    public Crypto updateCrypto(Long id, Crypto crypto) {
-        return cryptoRepository.findById(id)
-                .map(existingCrypto -> {
-                    existingCrypto.setName(crypto.getName());
-                    existingCrypto.setPriceWhenBought(crypto.getPriceWhenBought());
-                    existingCrypto.setPriceNow(crypto.getPriceNow());
-                    existingCrypto.setQuantity(crypto.getQuantity());
-                    return cryptoRepository.save(existingCrypto);
-                })
-                .orElseThrow(() -> new RuntimeException("Crypto not found with id: " + id));
-    }
-
-    @Override
-    public void deleteCrypto(Long id) {
-        cryptoRepository.deleteById(id);
     }
 
     private String formatDate(String date) throws IOException {

@@ -1,19 +1,32 @@
 package com.portfolio.service;
 
 import com.portfolio.entity.asset.Crypto;
-import com.portfolio.external.api.crypto.CurrentCryptoResponse;
-import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
+import com.portfolio.repository.CryptoRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface CryptoService {
-    CurrentCryptoResponse getCryptoPriceInUsd(String cryptoId) throws Exception;
-    HistoricalCryptoResponse getHistoricalPrice(String cryptoId, String date) throws Exception;
+@Service
+@RequiredArgsConstructor
+public class CryptoService {
 
-    List<Crypto> getCryptosByUserId(Long userId);
-    Optional<Crypto> getCryptoById(Long id);
-    Crypto saveCrypto(Crypto crypto);
-    Crypto updateCrypto(Long id, Crypto crypto);
-    void deleteCrypto(Long id);
+    private final CryptoRepository cryptoRepository;
+
+    public Crypto saveCrypto(Crypto crypto) {
+        return cryptoRepository.save(crypto);
+    }
+
+    public Optional<Crypto> getCryptoById(Long id) {
+        return cryptoRepository.findById(id);
+    }
+
+    public List<Crypto> getCryptosByUserId(Long userId) {
+        return cryptoRepository.findAllById(userId);
+    }
+
+    public void deleteCrypto(Long id) {
+        cryptoRepository.deleteById(id);
+    }
 }
