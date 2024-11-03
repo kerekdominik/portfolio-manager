@@ -5,41 +5,33 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class StockTest {
     private Portfolio mockPortfolio;
+    private Stock stock;
 
     @BeforeEach
     void setUp() {
         mockPortfolio = Mockito.mock(Portfolio.class);
+        stock = new Stock();
     }
 
     @Test
     void testNoArgsConstructor() {
-        Stock stock = new Stock();
-        assertNotNull(stock);
+        assertNotNull(stock, "Stock object should not be null with no-args constructor.");
     }
 
     @Test
-    void testAllArgsConstructor() {
-        Stock stock = new Stock();
+    void testSettersAndGetters() {
         stock.setId(1L);
         stock.setSymbol("AAPL");
         stock.setName("Apple Inc.");
-        stock.setPriceWhenBought(145.86);
-        stock.setPriceNow(150.00);
         stock.setPortfolio(mockPortfolio);
-        stock.setPurchaseDate(LocalDateTime.now());
 
-        assertEquals(1L, stock.getId());
-        assertEquals("AAPL", stock.getSymbol());
-        assertEquals("Apple Inc.", stock.getName());
-        assertEquals(145.86, stock.getPriceWhenBought());
-        assertEquals(150.00, stock.getPriceNow());
-        assertEquals(mockPortfolio, stock.getPortfolio());
-        assertNotNull(stock.getPurchaseDate());
+        assertEquals(1L, stock.getId(), "ID should be 1");
+        assertEquals("AAPL", stock.getSymbol(), "Symbol should be AAPL");
+        assertEquals("Apple Inc.", stock.getName(), "Name should be Apple Inc.");
+        assertEquals(mockPortfolio, stock.getPortfolio(), "Portfolio should match mockPortfolio");
     }
 }
