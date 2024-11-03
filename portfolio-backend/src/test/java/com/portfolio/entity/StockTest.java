@@ -27,11 +27,9 @@ class StockTest {
         stock.setId(1L);
         stock.setSymbol("AAPL");
         stock.setName("Apple Inc.");
-        stock.setPortfolio(mockPortfolio);
 
         assertEquals(1L, stock.getId(), "ID should be 1");
         assertEquals("AAPL", stock.getSymbol(), "Symbol should be AAPL");
         assertEquals("Apple Inc.", stock.getName(), "Name should be Apple Inc.");
-        assertEquals(mockPortfolio, stock.getPortfolio(), "Portfolio should match mockPortfolio");
     }
 }

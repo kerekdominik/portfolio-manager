@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -33,7 +33,7 @@ public class PortfolioAsset {
     private Group group;
 
     private double quantity;
-    private LocalDateTime purchaseDate;
+    private LocalDate purchaseDate;
     private double priceWhenBought;
     private double priceNow;
 }

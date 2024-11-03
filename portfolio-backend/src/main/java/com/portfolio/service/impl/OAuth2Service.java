@@ -8,6 +8,8 @@ import com.portfolio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class OAuth2Service {
@@ -27,9 +29,11 @@ public class OAuth2Service {
             userRepository.save(user);
         }
 
-        Portfolio portfolio = new Portfolio();
-        portfolio.setUser(user);
-        portfolioRepository.save(portfolio);
+        if (portfolioRepository.findByUser(user).isEmpty()) {
+            Portfolio newPortfolio = new Portfolio();
+            newPortfolio.setUser(user);
+            portfolioRepository.save(newPortfolio);
+        }
 
         String jwtToken = jwtService.generateToken(user);
         return AuthenticationResponseDto.builder()

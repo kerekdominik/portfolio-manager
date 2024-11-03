@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class CryptoController {
         portfolioAsset.setPriceWhenBought(cryptoRequest.getPrice());
         portfolioAsset.setQuantity(cryptoRequest.getQuantity());
         portfolioAsset.setPurchaseDate(
-                cryptoRequest.getPurchaseDate() != null ? cryptoRequest.getPurchaseDate() : LocalDateTime.now()
+                cryptoRequest.getPurchaseDate() != null ? cryptoRequest.getPurchaseDate() : LocalDate.now()
         );
 
         if (cryptoRequest.getGroupId() != null) {
@@ -74,19 +74,23 @@ public class CryptoController {
 
     @GetMapping
     public ResponseEntity<List<CryptoResponseDto>> getAllCryptosInPortfolio(
-            @AuthenticationPrincipal Portfolio portfolio) {
+            @AuthenticationPrincipal User user) {
+
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
 
         List<PortfolioAsset> assets = portfolioAssetRepository.findByPortfolio(portfolio);
         List<CryptoResponseDto> cryptos = assets.stream()
                 .filter(asset -> asset.getAsset() instanceof Crypto)
-                .map(asset -> {
+                .map(crypto -> {
                     CryptoResponseDto dto = new CryptoResponseDto();
-                    dto.setId(asset.getId());
-                    dto.setName(asset.getAsset().getName());
-                    dto.setSymbol(asset.getAsset().getSymbol());
-                    dto.setQuantity(asset.getQuantity());
-                    dto.setPurchaseDate(asset.getPurchaseDate());
-                    dto.setGroupName(asset.getGroup() != null ? asset.getGroup().getName() : null);
+                    dto.setId(crypto.getId());
+                    dto.setName(crypto.getAsset().getName());
+                    dto.setSymbol(crypto.getAsset().getSymbol());
+                    dto.setPrice(crypto.getPriceWhenBought());
+                    dto.setQuantity(crypto.getQuantity());
+                    dto.setPurchaseDate(crypto.getPurchaseDate());
+                    dto.setGroupName(crypto.getGroup() != null ? crypto.getGroup().getName() : null);
                     return dto;
                 })
                 .toList();
@@ -98,7 +102,10 @@ public class CryptoController {
     public ResponseEntity<Map<String, String>> updateCryptoInPortfolio(
             @PathVariable Long id,
             @RequestBody CryptoRequestDto cryptoRequest,
-            @AuthenticationPrincipal Portfolio portfolio) {
+            @AuthenticationPrincipal User user) {
+
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
 
         Optional<PortfolioAsset> portfolioAssetOpt = portfolioAssetRepository.findByIdAndPortfolio(id, portfolio);
         if (portfolioAssetOpt.isEmpty()) {
@@ -120,7 +127,10 @@ public class CryptoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteCryptoFromPortfolio(
             @PathVariable Long id,
-            @AuthenticationPrincipal Portfolio portfolio) {
+            @AuthenticationPrincipal User user) {
+
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
 
         Optional<PortfolioAsset> portfolioAssetOpt = portfolioAssetRepository.findByIdAndPortfolio(id, portfolio);
         if (portfolioAssetOpt.isPresent()) {
