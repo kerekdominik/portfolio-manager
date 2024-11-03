@@ -1,7 +1,8 @@
 <h1 mat-dialog-title>{{ isEditMode ? 'Edit Crypto' : 'Add New Crypto' }}</h1>
 <form (ngSubmit)="onSave()" #cryptoForm="ngForm">
   <div mat-dialog-content>
-    <mat-form-field appearance="fill">
+    <!-- Cryptocurrency Name Field -->
+    <mat-form-field appearance="fill" required>
       <mat-label>Cryptocurrency Name</mat-label>
       <input
         matInput
@@ -11,16 +12,18 @@
         required
       />
       <mat-autocomplete #auto="matAutocomplete">
-        <cdk-virtual-scroll-viewport itemSize="48" style="height: 200px;">
-          <mat-option
-            *cdkVirtualFor="let crypto of filteredCryptoNames | async"
-            [value]="crypto">
-            {{ crypto }}
-          </mat-option>
-        </cdk-virtual-scroll-viewport>
+        <mat-option
+          *ngFor="let crypto of filteredCryptoNames | async"
+          [value]="crypto">
+          {{ crypto }}
+        </mat-option>
       </mat-autocomplete>
+      <mat-error *ngIf="cryptoControl.hasError('required')">
+        Cryptocurrency Name is required
+      </mat-error>
     </mat-form-field>
 
+    <!-- Price Field -->
     <mat-form-field appearance="fill">
       <mat-label>Price</mat-label>
       <input
@@ -36,6 +39,7 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Quantity Field -->
     <mat-form-field appearance="fill">
       <mat-label>Quantity</mat-label>
       <input
@@ -51,10 +55,30 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Purchase Date Field -->
+    <mat-form-field appearance="fill">
+      <mat-label>Purchase Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [formControl]="dateControl"
+        placeholder="Select a date"
+        required
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="dateControl.hasError('required')">
+        Purchase Date is required
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Group Field (Optional) -->
     <mat-form-field appearance="fill">
       <mat-label>Group</mat-label>
       <mat-select [(ngModel)]="tempData.group" name="group">
-        <mat-option *ngFor="let group of groups" [value]="group.name">{{ group.name }}</mat-option>
+        <mat-option *ngFor="let group of groups" [value]="group.name">
+          {{ group.name }}
+        </mat-option>
       </mat-select>
     </mat-form-field>
   </div>
@@ -65,7 +89,7 @@
       mat-raised-button
       color="primary"
       type="submit"
-      [disabled]="!cryptoForm.form.valid || !cryptoControl.valid"
+      [disabled]="!cryptoForm.form.valid || !cryptoControl.valid || !dateControl.valid"
     >
       {{ isEditMode ? 'Update' : 'Add' }}
     </button>
