@@ -1,6 +1,5 @@
 package com.portfolio.controller;
 
-import com.portfolio.entity.asset.external.CryptoListItem;
 import com.portfolio.external.api.crypto.CurrentCryptoResponse;
 import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
 import com.portfolio.repository.CryptoListRepository;
@@ -23,12 +22,18 @@ public class ExternalCryptoController {
     private final CryptoListRepository cryptoListRepository;
 
     @GetMapping("/list")
-    public ResponseEntity<List<String>> getAllCryptoNames() {
-        List<String> cryptoNames = cryptoListRepository.findAll()
+    public ResponseEntity<List<Map<String, String>>> getAllCryptoDetails() {
+        List<Map<String, String>> cryptoDetails = cryptoListRepository.findAll()
                 .stream()
-                .map(CryptoListItem::getName)
+                .map(crypto -> {
+                    Map<String, String> details = new HashMap<>();
+                    details.put("id", crypto.getId());
+                    details.put("name", crypto.getName());
+                    details.put("symbol", crypto.getSymbol());
+                    return details;
+                })
                 .toList();
-        return ResponseEntity.ok(cryptoNames);
+        return ResponseEntity.ok(cryptoDetails);
     }
 
     @GetMapping("/current/price")

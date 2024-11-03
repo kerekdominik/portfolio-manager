@@ -27,11 +27,9 @@ class CryptoTest {
         crypto.setId(1L);
         crypto.setSymbol("BTC");
         crypto.setName("Bitcoin");
-        crypto.setPortfolio(mockPortfolio);
 
         assertEquals(1L, crypto.getId(), "ID should be 1");
         assertEquals("BTC", crypto.getSymbol(), "Symbol should be BTC");
         assertEquals("Bitcoin", crypto.getName(), "Name should be Bitcoin");
-        assertEquals(mockPortfolio, crypto.getPortfolio(), "Portfolio should match mockPortfolio");
     }
 }

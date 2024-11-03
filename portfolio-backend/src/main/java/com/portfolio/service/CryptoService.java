@@ -14,12 +14,16 @@ public class CryptoService {
 
     private final CryptoRepository cryptoRepository;
 
-    public Crypto saveCrypto(Crypto crypto) {
-        return cryptoRepository.save(crypto);
+    public void saveCrypto(Crypto crypto) {
+        cryptoRepository.save(crypto);
     }
 
     public Optional<Crypto> getCryptoById(Long id) {
         return cryptoRepository.findById(id);
+    }
+
+    public Optional<Crypto> getCryptoByExternalId(String id) {
+        return cryptoRepository.findByExternalId(id);
     }
 
     public List<Crypto> getCryptosByUserId(Long userId) {
