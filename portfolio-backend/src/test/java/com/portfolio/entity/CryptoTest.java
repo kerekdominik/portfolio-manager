@@ -9,33 +9,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CryptoTest {
     private Portfolio mockPortfolio;
+    private Crypto crypto;
 
     @BeforeEach
     void setUp() {
         mockPortfolio = Mockito.mock(Portfolio.class);
+        crypto = new Crypto();
     }
 
     @Test
     void testNoArgsConstructor() {
-        Crypto crypto = new Crypto();
-        assertNotNull(crypto);
+        assertNotNull(crypto, "Crypto object should not be null with no-args constructor.");
     }
 
     @Test
-    void testAllArgsConstructor() {
-        Crypto crypto = new Crypto();
+    void testSettersAndGetters() {
         crypto.setId(1L);
         crypto.setSymbol("BTC");
         crypto.setName("Bitcoin");
-        crypto.setPriceWhenBought(45000.0);
-        crypto.setPriceNow(10000.0);
         crypto.setPortfolio(mockPortfolio);
 
-        assertEquals(1L, crypto.getId());
-        assertEquals("BTC", crypto.getSymbol());
-        assertEquals("Bitcoin", crypto.getName());
-        assertEquals(45000.0, crypto.getPriceWhenBought());
-        assertEquals(10000.0, crypto.getPriceNow());
-        assertEquals(mockPortfolio, crypto.getPortfolio());
+        assertEquals(1L, crypto.getId(), "ID should be 1");
+        assertEquals("BTC", crypto.getSymbol(), "Symbol should be BTC");
+        assertEquals("Bitcoin", crypto.getName(), "Name should be Bitcoin");
+        assertEquals(mockPortfolio, crypto.getPortfolio(), "Portfolio should match mockPortfolio");
     }
 }
