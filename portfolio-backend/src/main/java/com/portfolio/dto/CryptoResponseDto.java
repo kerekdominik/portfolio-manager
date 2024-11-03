@@ -2,14 +2,15 @@ package com.portfolio.dto;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 public class CryptoResponseDto {
     private Long id;
     private String name;
     private String symbol;
+    private double price;
     private double quantity;
-    private LocalDateTime purchaseDate;
+    private LocalDate purchaseDate;
     private String groupName;
 }
