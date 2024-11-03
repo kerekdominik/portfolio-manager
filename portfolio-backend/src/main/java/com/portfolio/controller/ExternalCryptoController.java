@@ -1,12 +1,10 @@
 package com.portfolio.controller;
 
-import com.portfolio.entity.asset.Crypto;
 import com.portfolio.entity.asset.external.CryptoListItem;
 import com.portfolio.external.api.crypto.CurrentCryptoResponse;
 import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
 import com.portfolio.repository.CryptoListRepository;
-import com.portfolio.service.CryptoService;
-import io.swagger.v3.oas.annotations.Operation;
+import com.portfolio.service.ExternalCryptoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +16,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/crypto")
 @RequiredArgsConstructor
-public class CryptoController {
+public class ExternalCryptoController {
 
-    private final CryptoService cryptoService;
+    private final ExternalCryptoService externalCryptoService;
     private final CryptoListRepository cryptoListRepository;
-
-    @GetMapping("/user")
-    @Operation(summary = "Get all cryptocurrencies for a user", description = "Returns a list of all cryptocurrencies for a given user.")
-    public ResponseEntity<List<Crypto>> getCryptosByUserId(@RequestParam Long userId) {
-        return ResponseEntity.ok(cryptoService.getCryptosByUserId(userId));
-    }
 
     @GetMapping("/list")
     public ResponseEntity<List<String>> getAllCryptoNames() {
@@ -38,34 +30,10 @@ public class CryptoController {
         return ResponseEntity.ok(cryptoNames);
     }
 
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Crypto> getCryptoById(@PathVariable Long id) {
-        return cryptoService.getCryptoById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<Crypto> createCrypto(@RequestBody Crypto crypto) {
-        return ResponseEntity.ok(cryptoService.saveCrypto(crypto));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Crypto> updateCrypto(@PathVariable Long id, @RequestBody Crypto crypto) {
-        return ResponseEntity.ok(cryptoService.updateCrypto(id, crypto));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCrypto(@PathVariable Long id) {
-        cryptoService.deleteCrypto(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/current/price")
     public ResponseEntity<?> getCryptoPrice(@RequestParam String id) {
         try {
-            CurrentCryptoResponse currentCryptoResponse = cryptoService.getCryptoPriceInUsd(id.toLowerCase());
+            CurrentCryptoResponse currentCryptoResponse = externalCryptoService.getCryptoPriceInUsd(id.toLowerCase());
             Double price = currentCryptoResponse.getPriceInUSD(id.toLowerCase());
 
             if (price != null) {
@@ -86,7 +54,7 @@ public class CryptoController {
     @GetMapping("/historical/price")
     public ResponseEntity<?> getHistoricalPrice(@RequestParam String id, @RequestParam String date) {
         try {
-            HistoricalCryptoResponse historicalCryptoResponse = cryptoService.getHistoricalPrice(id.toLowerCase(), date);
+            HistoricalCryptoResponse historicalCryptoResponse = externalCryptoService.getHistoricalPrice(id.toLowerCase(), date);
             Double price = historicalCryptoResponse.getMarketData().getPriceInUSD();
 
             if (price != null) {
