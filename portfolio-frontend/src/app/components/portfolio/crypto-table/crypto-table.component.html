@@ -7,6 +7,11 @@
     <mat-cell *matCellDef="let element"> {{ element.name }} </mat-cell>
   </ng-container>
 
+  <ng-container matColumnDef="date">
+    <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.date | date:'yyyy-MM-dd' }} </mat-cell>
+  </ng-container>
+
   <ng-container matColumnDef="price">
     <mat-header-cell *matHeaderCellDef> Price </mat-header-cell>
     <mat-cell *matCellDef="let element"> {{ element.price | currency:'USD' }} </mat-cell>

@@ -11,7 +11,7 @@ import {
 } from '@angular/material/table';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
-import {CurrencyPipe} from '@angular/common';
+import {CurrencyPipe, DatePipe} from '@angular/common';
 import {CryptoPriceService} from '../../services/crypto-price.service';
 import {CryptoDialogComponent} from './crypto-dialog/crypto-dialog.component';
 
@@ -32,13 +32,14 @@ import {CryptoDialogComponent} from './crypto-dialog/crypto-dialog.component';
     MatRow,
     MatHeaderRowDef,
     CurrencyPipe,
-    MatButton
+    MatButton,
+    DatePipe
   ],
   templateUrl: './crypto-table.component.html',
   styleUrl: './crypto-table.component.css'
 })
 export class CryptoTableComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'price', 'currentPrice', 'quantity', 'group', 'actions'];
+  displayedColumns: string[] = ['name', 'date', 'price', 'currentPrice', 'quantity', 'group', 'actions'];
   dataSource = [
     { name: 'Bitcoin', price: 50000, currentPrice: 51000, quantity: 2, group: 'Top Cryptos' },
     { name: 'Ethereum', price: 4000, currentPrice: 4200, quantity: 5, group: 'Altcoins' }

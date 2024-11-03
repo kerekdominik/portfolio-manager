@@ -7,18 +7,23 @@ import {
   MatDialogRef,
   MatDialogTitle
 } from '@angular/material/dialog';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatButton } from '@angular/material/button';
-import { MatOption, MatSelect } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule} from '@angular/material/input';
+import { MatButtonModule} from '@angular/material/button';
+import { MatSelectModule} from '@angular/material/select';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { debounceTime, map, Observable, startWith } from 'rxjs';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Group, GroupService } from '../../../services/group-services.service';
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import {MAT_DATE_FORMATS, MAT_NATIVE_DATE_FORMATS, MatNativeDateModule} from '@angular/material/core';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_NATIVE_DATE_FORMATS,
+  MatNativeDateModule,
+  NativeDateAdapter
+} from '@angular/material/core';
 import {MatIconModule} from '@angular/material/icon';
 
 @Component({
@@ -27,31 +32,27 @@ import {MatIconModule} from '@angular/material/icon';
   imports: [
     MatDialogTitle,
     MatDialogContent,
-    MatFormField,
-    MatInput,
+    MatFormFieldModule,
+    MatInputModule,
     FormsModule,
     MatDialogActions,
-    MatButton,
-    MatLabel,
-    MatSelect,
-    MatOption,
+    MatButtonModule,
+    MatSelectModule,
     NgForOf,
     ReactiveFormsModule,
-    MatAutocompleteTrigger,
-    MatAutocomplete,
+    MatAutocompleteModule,
     AsyncPipe,
-    ScrollingModule,
     NgIf,
-    MatError,
     MatDatepickerModule,
     MatNativeDateModule,
     MatIconModule
   ],
   providers: [
+    { provide: DateAdapter, useClass: NativeDateAdapter },
     { provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS },
   ],
   templateUrl: './crypto-dialog.component.html',
-  styleUrl: './crypto-dialog.component.css'
+  styleUrls: ['./crypto-dialog.component.css']
 })
 export class CryptoDialogComponent implements OnInit {
   groups: Group[] = [];
@@ -84,7 +85,7 @@ export class CryptoDialogComponent implements OnInit {
         this.groups = groups;
       },
       error: (error) => {
-        console.error("Error fetching groups:", error);
+        console.error('Error fetching groups:', error);
       }
     });
 
