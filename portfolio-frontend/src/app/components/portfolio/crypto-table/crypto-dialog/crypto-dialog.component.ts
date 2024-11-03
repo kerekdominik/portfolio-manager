@@ -7,13 +7,15 @@ import {
   MatDialogRef,
   MatDialogTitle
 } from '@angular/material/dialog';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
 import { MatOption, MatSelect } from '@angular/material/select';
-import { AsyncPipe, NgForOf } from '@angular/common';
-import { map, Observable, startWith } from 'rxjs';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {debounceTime, map, Observable, startWith} from 'rxjs';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import {Group, GroupService} from '../../../services/group-services.service';
 
 @Component({
   selector: 'app-crypto-dialog',
@@ -33,13 +35,16 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
     ReactiveFormsModule,
     MatAutocompleteTrigger,
     MatAutocomplete,
-    AsyncPipe
+    AsyncPipe,
+    ScrollingModule,
+    NgIf,
+    MatError
   ],
   templateUrl: './crypto-dialog.component.html',
   styleUrl: './crypto-dialog.component.css'
 })
 export class CryptoDialogComponent implements OnInit {
-  groups = ['Top Cryptos', 'Altcoins', 'Stablecoins']; // TODO: API-ból beolvasni
+  groups: Group[] = [];
   tempData: any = {};
   cryptoControl = new FormControl('', Validators.required);
   filteredCryptoNames: Observable<string[]>;
@@ -47,7 +52,8 @@ export class CryptoDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<CryptoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { element?: any; cryptoNames: string[] }
+    @Inject(MAT_DIALOG_DATA) public data: { element?: any; cryptoNames: string[] },
+    private groupService: GroupService
   ) {
     this.isEditMode = !!data.element;
     if (this.isEditMode) {
@@ -58,7 +64,17 @@ export class CryptoDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.groupService.getAllGroups().subscribe({
+      next: (groups) => {
+        this.groups = groups;
+      },
+      error: (error) => {
+        console.error("Error fetching groups:", error);
+      }
+    });
+
     this.filteredCryptoNames = this.cryptoControl.valueChanges.pipe(
+      debounceTime(100),
       startWith(''),
       map(value => this._filter(value || ''))
     );
@@ -66,9 +82,13 @@ export class CryptoDialogComponent implements OnInit {
 
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
-    return this.data.cryptoNames.filter(name =>
-      name.toLowerCase().includes(filterValue)
-    );
+    if (!filterValue) {
+      return [];
+    }
+
+    return this.data.cryptoNames
+      .filter(name => name.toLowerCase().includes(filterValue))
+      .slice(0, 20);
   }
 
   onCancel(): void {
