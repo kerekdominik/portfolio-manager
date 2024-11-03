@@ -10,8 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/crypto")
@@ -26,49 +27,54 @@ public class ExternalCryptoController {
         List<String> cryptoNames = cryptoListRepository.findAll()
                 .stream()
                 .map(CryptoListItem::getName)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(cryptoNames);
     }
 
     @GetMapping("/current/price")
-    public ResponseEntity<?> getCryptoPrice(@RequestParam String id) {
+    public ResponseEntity<Map<String, Object>> getCryptoPrice(@RequestParam String id) {
         try {
             CurrentCryptoResponse currentCryptoResponse = externalCryptoService.getCryptoPriceInUsd(id.toLowerCase());
             Double price = currentCryptoResponse.getPriceInUSD(id.toLowerCase());
 
-            if (price != null) {
-                return ResponseEntity.ok(price);
-            } else {
-                return ResponseEntity.status(404).body("Price not found for cryptocurrency: " + id);
-            }
+            Map<String, Object> response = new HashMap<>();
+            response.put("cryptoId", id);
+            response.put("price", price);
+
+            return price != null
+                    ? ResponseEntity.ok(response)
+                    : ResponseEntity.status(404).body(Map.of("error", "Price not found for cryptocurrency: " + id));
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error fetching price: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", "Error fetching price: " + e.getMessage()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ResponseEntity.status(500).body("Request interrupted: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", "Request interrupted: " + e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(400).body(Map.of("error", "Invalid cryptocurrency id: " + e.getMessage()));
         }
     }
 
     @GetMapping("/historical/price")
-    public ResponseEntity<?> getHistoricalPrice(@RequestParam String id, @RequestParam String date) {
+    public ResponseEntity<Map<String, Object>> getHistoricalPrice(@RequestParam String id, @RequestParam String date) {
         try {
             HistoricalCryptoResponse historicalCryptoResponse = externalCryptoService.getHistoricalPrice(id.toLowerCase(), date);
             Double price = historicalCryptoResponse.getMarketData().getPriceInUSD();
 
-            if (price != null) {
-                return ResponseEntity.ok(price);
-            } else {
-                return ResponseEntity.status(404).body("Historical price not found for cryptocurrency: " + id + " on date: " + date);
-            }
+            Map<String, Object> response = new HashMap<>();
+            response.put("cryptoId", id);
+            response.put("date", date);
+            response.put("price", price);
+
+            return price != null
+                    ? ResponseEntity.ok(response)
+                    : ResponseEntity.status(404).body(Map.of("error", "Historical price not found for cryptocurrency: " + id + " on date: " + date));
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error fetching historical price: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", "Error fetching historical price: " + e.getMessage()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ResponseEntity.status(500).body("Request interrupted: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", "Request interrupted: " + e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            return ResponseEntity.status(400).body(Map.of("error", "Invalid date format or other issue: " + e.getMessage()));
         }
     }
 }
