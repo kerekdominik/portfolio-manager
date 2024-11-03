@@ -3,8 +3,10 @@ package com.portfolio.service;
 import com.portfolio.dto.auth.AuthenticationResponseDto;
 import com.portfolio.dto.auth.LoginRequestDto;
 import com.portfolio.dto.auth.RegisterRequestDto;
+import com.portfolio.entity.Portfolio;
 import com.portfolio.entity.User;
 import com.portfolio.mapper.UserMapper;
+import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.repository.UserRepository;
 import com.portfolio.service.impl.AuthService;
 import com.portfolio.service.impl.JwtService;
@@ -12,7 +14,6 @@ import com.portfolio.service.impl.OAuth2Service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +33,9 @@ class AuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PortfolioRepository portfolioRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -62,11 +66,15 @@ class AuthServiceTest {
         User user = spy(new User());
         user.setUsername("testUser");
 
+        Portfolio portfolio = new Portfolio();
+        portfolio.setUser(user);
+
         // Mock behaviors
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
         when(userMapper.userDtoToUser(registerRequestDto)).thenReturn(user);
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
         when(userRepository.save(user)).thenReturn(user);
+        when(portfolioRepository.save(any(Portfolio.class))).thenReturn(portfolio);
         when(jwtService.generateToken(user)).thenReturn("jwtToken");
 
         // Act
@@ -82,6 +90,7 @@ class AuthServiceTest {
         verify(passwordEncoder).encode("password123");
         verify(user).setPassword("encodedPassword");
         verify(userRepository).save(user);
+        verify(portfolioRepository).save(any(Portfolio.class));
         verify(jwtService).generateToken(user);
     }
 
@@ -102,7 +111,7 @@ class AuthServiceTest {
 
         // Verify interactions
         verify(userRepository).findByEmail("test@example.com");
-        verifyNoMoreInteractions(userMapper, passwordEncoder, userRepository, jwtService);
+        verifyNoMoreInteractions(userMapper, passwordEncoder, userRepository, jwtService, portfolioRepository);
     }
 
     @Test
@@ -164,6 +173,7 @@ class AuthServiceTest {
         user.setEmail(email);
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(portfolioRepository.findByUser(user)).thenReturn(Optional.of(new Portfolio()));
         when(jwtService.generateToken(user)).thenReturn("jwtToken");
 
         // Act
@@ -176,7 +186,7 @@ class AuthServiceTest {
         // Verify interactions
         verify(userRepository).findByEmail(email);
         verify(jwtService).generateToken(user);
-        verify(userRepository, never()).save(any(User.class));
+        verify(portfolioRepository, never()).save(any(Portfolio.class));
     }
 
     @Test
@@ -189,7 +199,10 @@ class AuthServiceTest {
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        ArgumentCaptor<Portfolio> portfolioCaptor = ArgumentCaptor.forClass(Portfolio.class);
+
         when(userRepository.save(userCaptor.capture())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(portfolioRepository.save(portfolioCaptor.capture())).thenAnswer(invocation -> invocation.getArgument(0));
         when(jwtService.generateToken(any(User.class))).thenReturn("jwtToken");
 
         // Act
@@ -205,9 +218,13 @@ class AuthServiceTest {
         assertEquals(firstName, savedUser.getFirstName());
         assertEquals(lastName, savedUser.getLastName());
 
+        Portfolio savedPortfolio = portfolioCaptor.getValue();
+        assertEquals(savedUser, savedPortfolio.getUser());
+
         // Verify interactions
         verify(userRepository).findByEmail(email);
         verify(userRepository).save(savedUser);
+        verify(portfolioRepository).save(savedPortfolio);
         verify(jwtService).generateToken(savedUser);
     }
 }

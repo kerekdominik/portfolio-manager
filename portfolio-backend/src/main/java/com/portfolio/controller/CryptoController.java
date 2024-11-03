@@ -4,9 +4,13 @@ import com.portfolio.dto.CryptoRequestDto;
 import com.portfolio.dto.CryptoResponseDto;
 import com.portfolio.entity.Portfolio;
 import com.portfolio.entity.PortfolioAsset;
+import com.portfolio.entity.User;
 import com.portfolio.entity.asset.Crypto;
+import com.portfolio.entity.asset.external.CryptoListItem;
+import com.portfolio.repository.CryptoListRepository;
 import com.portfolio.repository.GroupRepository;
 import com.portfolio.repository.PortfolioAssetRepository;
+import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.service.CryptoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,26 +28,41 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CryptoController {
 
-    private final CryptoService cryptoService;
     private final PortfolioAssetRepository portfolioAssetRepository;
     private final GroupRepository groupRepository;
+    private final CryptoListRepository cryptoListRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final CryptoService cryptoService;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> addCryptoToPortfolio(
             @RequestBody CryptoRequestDto cryptoRequest,
-            @AuthenticationPrincipal Portfolio portfolio) {
+            @AuthenticationPrincipal User user) {
 
-        Optional<Crypto> cryptoOpt = cryptoService.getCryptoById(cryptoRequest.getAssetId());
-        if (cryptoOpt.isEmpty()) {
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+
+        Optional<CryptoListItem> cryptoListItemOpt = cryptoListRepository.findById(cryptoRequest.getId());
+        if (cryptoListItemOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid asset ID"));
         }
 
+        Crypto crypto = new Crypto(
+                cryptoListItemOpt.get().getId(),         // CoinGecko ID
+                cryptoListItemOpt.get().getName(),
+                cryptoListItemOpt.get().getSymbol()
+        );
+        crypto.setExternalId(cryptoRequest.getId());
+        cryptoService.saveCrypto(crypto);
+
         PortfolioAsset portfolioAsset = new PortfolioAsset();
         portfolioAsset.setPortfolio(portfolio);
-        portfolioAsset.setAsset(cryptoOpt.get());
+        portfolioAsset.setAsset(crypto);
+        portfolioAsset.setPriceWhenBought(cryptoRequest.getPrice());
         portfolioAsset.setQuantity(cryptoRequest.getQuantity());
-        portfolioAsset.setPurchaseDate(cryptoRequest.getPurchaseDate() != null ?
-                cryptoRequest.getPurchaseDate() : LocalDateTime.now());
+        portfolioAsset.setPurchaseDate(
+                cryptoRequest.getPurchaseDate() != null ? cryptoRequest.getPurchaseDate() : LocalDate.now()
+        );
 
         if (cryptoRequest.getGroupId() != null) {
             groupRepository.findById(cryptoRequest.getGroupId()).ifPresent(portfolioAsset::setGroup);
@@ -55,19 +74,23 @@ public class CryptoController {
 
     @GetMapping
     public ResponseEntity<List<CryptoResponseDto>> getAllCryptosInPortfolio(
-            @AuthenticationPrincipal Portfolio portfolio) {
+            @AuthenticationPrincipal User user) {
+
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
 
         List<PortfolioAsset> assets = portfolioAssetRepository.findByPortfolio(portfolio);
         List<CryptoResponseDto> cryptos = assets.stream()
                 .filter(asset -> asset.getAsset() instanceof Crypto)
-                .map(asset -> {
+                .map(crypto -> {
                     CryptoResponseDto dto = new CryptoResponseDto();
-                    dto.setId(asset.getId());
-                    dto.setName(asset.getAsset().getName());
-                    dto.setSymbol(asset.getAsset().getSymbol());
-                    dto.setQuantity(asset.getQuantity());
-                    dto.setPurchaseDate(asset.getPurchaseDate());
-                    dto.setGroupName(asset.getGroup() != null ? asset.getGroup().getName() : null);
+                    dto.setId(crypto.getId());
+                    dto.setName(crypto.getAsset().getName());
+                    dto.setSymbol(crypto.getAsset().getSymbol());
+                    dto.setPrice(crypto.getPriceWhenBought());
+                    dto.setQuantity(crypto.getQuantity());
+                    dto.setPurchaseDate(crypto.getPurchaseDate());
+                    dto.setGroupName(crypto.getGroup() != null ? crypto.getGroup().getName() : null);
                     return dto;
                 })
                 .toList();
@@ -79,7 +102,10 @@ public class CryptoController {
     public ResponseEntity<Map<String, String>> updateCryptoInPortfolio(
             @PathVariable Long id,
             @RequestBody CryptoRequestDto cryptoRequest,
-            @AuthenticationPrincipal Portfolio portfolio) {
+            @AuthenticationPrincipal User user) {
+
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
 
         Optional<PortfolioAsset> portfolioAssetOpt = portfolioAssetRepository.findByIdAndPortfolio(id, portfolio);
         if (portfolioAssetOpt.isEmpty()) {
@@ -101,7 +127,10 @@ public class CryptoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteCryptoFromPortfolio(
             @PathVariable Long id,
-            @AuthenticationPrincipal Portfolio portfolio) {
+            @AuthenticationPrincipal User user) {
+
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
 
         Optional<PortfolioAsset> portfolioAssetOpt = portfolioAssetRepository.findByIdAndPortfolio(id, portfolio);
         if (portfolioAssetOpt.isPresent()) {

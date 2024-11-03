@@ -1,6 +1,5 @@
 package com.portfolio.entity.asset;
 
-import com.portfolio.entity.Portfolio;
 import com.portfolio.entity.enums.AssetCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,12 +16,11 @@ import lombok.Setter;
 @Table(name = "common_asset")
 public abstract class CommonAsset {
     @Id
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String symbol;
     private String name;
-
-    @ManyToOne
-    private Portfolio portfolio;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
