@@ -1,57 +1,76 @@
-import {Component, OnInit} from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import {
   MatCell,
   MatCellDef,
   MatColumnDef,
   MatHeaderCell,
-  MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatHeaderCellDef, MatHeaderRow, MatHeaderRowDef, MatRow,
+  MatRowDef,
   MatTable
 } from '@angular/material/table';
-import {MatButton, MatIconButton} from '@angular/material/button';
-import {MatIcon} from '@angular/material/icon';
-import {CurrencyPipe, DatePipe} from '@angular/common';
-import {CryptoPriceService} from '../../services/crypto-price.service';
-import {CryptoDialogComponent} from './crypto-dialog/crypto-dialog.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CryptoPriceService, Crypto } from '../../services/crypto-price.service';
+import { CryptoDialogComponent } from './crypto-dialog/crypto-dialog.component';
 
 @Component({
   selector: 'app-crypto-table',
   standalone: true,
   imports: [
     MatTable,
+    MatButtonModule,
+    MatIconModule,
+    CurrencyPipe,
+    DatePipe,
     MatHeaderCell,
     MatCell,
+    MatColumnDef,
     MatHeaderCellDef,
     MatCellDef,
-    MatColumnDef,
-    MatIconButton,
-    MatIcon,
-    MatHeaderRow,
     MatRowDef,
+    MatHeaderRow,
     MatRow,
-    MatHeaderRowDef,
-    CurrencyPipe,
-    MatButton,
-    DatePipe
+    MatHeaderRowDef
   ],
   templateUrl: './crypto-table.component.html',
-  styleUrl: './crypto-table.component.css'
+  styleUrls: ['./crypto-table.component.css']
 })
 export class CryptoTableComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'date', 'price', 'currentPrice', 'quantity', 'group', 'actions'];
-  dataSource = [
-    { name: 'Bitcoin', price: 50000, currentPrice: 51000, quantity: 2, group: 'Top Cryptos' },
-    { name: 'Ethereum', price: 4000, currentPrice: 4200, quantity: 5, group: 'Altcoins' }
-  ];
+  displayedColumns: string[] = ['name', 'symbol', 'purchaseDate', 'price', 'quantity', 'groupName', 'actions'];
+  dataSource: Crypto[] = [];
+  cryptoList: { id: string; name: string, symbol: string }[] = [];
 
-  cryptoNames: string[] = [];
-
-  constructor(public dialog: MatDialog, private cryptoService: CryptoPriceService) {}
+  constructor(
+    public dialog: MatDialog,
+    private cryptoService: CryptoPriceService
+  ) {}
 
   ngOnInit(): void {
-    this.cryptoService.getAllCryptoNames().subscribe(names => {
-      this.cryptoNames = names;
+    this.loadCryptos();
+    this.loadCryptoList();
+  }
+
+  loadCryptos(): void {
+    this.cryptoService.getAllCryptos().subscribe({
+      next: (cryptos) => {
+        this.dataSource = cryptos;
+      },
+      error: (error) => {
+        console.error('Error fetching cryptos:', error);
+      }
+    });
+  }
+
+  loadCryptoList(): void {
+    this.cryptoService.getAllCryptoNames().subscribe({
+      next: (list) => {
+        this.cryptoList = list;
+      },
+      error: (error) => {
+        console.error('Error fetching crypto list:', error);
+      }
     });
   }
 
@@ -59,35 +78,38 @@ export class CryptoTableComponent implements OnInit {
     const dialogRef = this.dialog.open(CryptoDialogComponent, {
       width: '300px',
       data: {
-        cryptoNames: this.cryptoNames
+        cryptoList: this.cryptoList
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.dataSource = [...this.dataSource, result];
+        this.loadCryptos();
       }
     });
   }
 
-  openEditDialog(element: any): void {
+  openEditDialog(element: Crypto): void {
     const dialogRef = this.dialog.open(CryptoDialogComponent, {
       width: '300px',
-      data: { element, cryptoNames: this.cryptoNames }
+      data: { element, cryptoList: this.cryptoList }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const index = this.dataSource.findIndex(item => item.name === element.name);
-        if (index > -1) {
-          this.dataSource[index] = result;
-          this.dataSource = [...this.dataSource];
-        }
+        this.loadCryptos();
       }
     });
   }
 
-  delete(element: any): void {
-    this.dataSource = this.dataSource.filter(item => item.name !== element.name);
+  delete(element: Crypto): void {
+    this.cryptoService.deleteCrypto(element.id).subscribe({
+      next: () => {
+        this.loadCryptos();
+      },
+      error: (error) => {
+        console.error('Error deleting crypto:', error);
+      }
+    });
   }
 }

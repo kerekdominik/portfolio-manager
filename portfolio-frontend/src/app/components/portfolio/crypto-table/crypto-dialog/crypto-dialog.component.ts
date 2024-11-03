@@ -16,7 +16,13 @@ import { map, Observable, startWith } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Group, GroupService } from '../../../services/group-services.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { DateAdapter, MatNativeDateModule, NativeDateAdapter } from '@angular/material/core';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_NATIVE_DATE_FORMATS,
+  MatNativeDateModule,
+  NativeDateAdapter
+} from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { CryptoPriceService, Crypto } from '../../../services/crypto-price.service';
 
@@ -42,6 +48,7 @@ import { CryptoPriceService, Crypto } from '../../../services/crypto-price.servi
   ],
   providers: [
     { provide: DateAdapter, useClass: NativeDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS },
   ],
   templateUrl: './crypto-dialog.component.html',
   styleUrls: ['./crypto-dialog.component.css']
@@ -135,13 +142,17 @@ export class CryptoDialogComponent implements OnInit {
     if (this.cryptoForm.valid) {
       const formData = this.cryptoForm.getRawValue();
 
+      const purchaseDate = new Date(formData.purchaseDate);
+      purchaseDate.setHours(1, 0, 0, 0); // Set to 1AM to avoid timezone issues
+      const formattedDate = purchaseDate.toISOString().slice(0, 10);
+
       const cryptoData: Crypto = {
         id: formData.id,
         name: formData.name,
         symbol: formData.symbol,
         quantity: formData.quantity,
         price: formData.price,
-        purchaseDate: formData.purchaseDate.toISOString(),
+        purchaseDate: formattedDate,
         groupId: formData.groupId,
       };
 
