@@ -1,30 +1,24 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
-  MatDialogActions,
-  MatDialogContent,
   MatDialogRef,
-  MatDialogTitle
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule} from '@angular/material/input';
-import { MatButtonModule} from '@angular/material/button';
-import { MatSelectModule} from '@angular/material/select';
-import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
-import { debounceTime, map, Observable, startWith } from 'rxjs';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
+import { NgForOf, NgIf, AsyncPipe } from '@angular/common';
+import { map, Observable, startWith } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Group, GroupService } from '../../../services/group-services.service';
-
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  DateAdapter,
-  MAT_DATE_FORMATS,
-  MAT_NATIVE_DATE_FORMATS,
-  MatNativeDateModule,
-  NativeDateAdapter
-} from '@angular/material/core';
-import {MatIconModule} from '@angular/material/icon';
+import { DateAdapter, MatNativeDateModule, NativeDateAdapter } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { CryptoPriceService, Crypto } from '../../../services/crypto-price.service';
 
 @Component({
   selector: 'app-crypto-dialog',
@@ -34,7 +28,6 @@ import {MatIconModule} from '@angular/material/icon';
     MatDialogContent,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule,
     MatDialogActions,
     MatButtonModule,
     MatSelectModule,
@@ -49,34 +42,49 @@ import {MatIconModule} from '@angular/material/icon';
   ],
   providers: [
     { provide: DateAdapter, useClass: NativeDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS },
   ],
   templateUrl: './crypto-dialog.component.html',
   styleUrls: ['./crypto-dialog.component.css']
 })
 export class CryptoDialogComponent implements OnInit {
   groups: Group[] = [];
-  tempData: any = {};
-  cryptoControl = new FormControl('', Validators.required);
-  dateControl = new FormControl(new Date(), Validators.required);
-  filteredCryptoNames: Observable<string[]>;
+  cryptoForm: FormGroup;
+  filteredCryptoList: Observable<{ id: string; name: string; symbol: string }[]>;
   isEditMode: boolean;
+  cryptoId?: string;
 
   constructor(
     public dialogRef: MatDialogRef<CryptoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { element?: any; cryptoNames: string[] },
-    private groupService: GroupService
+    @Inject(MAT_DIALOG_DATA) public data: { element?: Crypto; cryptoList: { id: string; name: string; symbol: string }[] },
+    private groupService: GroupService,
+    private cryptoService: CryptoPriceService
   ) {
     this.isEditMode = !!data.element;
-    if (this.isEditMode) {
-      this.tempData = { ...data.element };
-      this.cryptoControl.setValue(this.tempData.name);
 
-      if (this.tempData.date) {
-        this.dateControl.setValue(new Date(this.tempData.date));
-      }
+    this.cryptoForm = new FormGroup({
+      name: new FormControl('', Validators.required),
+      id: new FormControl(''),
+      symbol: new FormControl({ value: '', disabled: true }),
+      quantity: new FormControl('', Validators.required),
+      price: new FormControl('', Validators.required),
+      purchaseDate: new FormControl(new Date(), Validators.required),
+      groupId: new FormControl(''),
+    });
+
+    if (this.isEditMode && data.element) {
+      this.cryptoId = data.element.id;
+      this.cryptoForm.patchValue({
+        name: data.element.name,
+        id: data.element.id,
+        symbol: data.element.symbol,
+        quantity: data.element.quantity,
+        price: data.element.price,
+        purchaseDate: new Date(data.element.purchaseDate),
+        groupId: data.element.groupId,
+      });
     }
-    this.filteredCryptoNames = new Observable<string[]>();
+
+    this.filteredCryptoList = new Observable<{ id: string; name: string; symbol: string }[]>();
   }
 
   ngOnInit(): void {
@@ -89,22 +97,34 @@ export class CryptoDialogComponent implements OnInit {
       }
     });
 
-    this.filteredCryptoNames = this.cryptoControl.valueChanges.pipe(
-      debounceTime(100),
+    this.filteredCryptoList = this.cryptoForm.get('name')!.valueChanges.pipe(
       startWith(''),
       map(value => this._filter(value || ''))
     );
+
+    this.cryptoForm.get('name')!.valueChanges.subscribe(name => {
+      const selectedCrypto = this.data.cryptoList.find(crypto => crypto.name === name);
+      if (selectedCrypto) {
+        this.cryptoForm.patchValue({
+          id: selectedCrypto.id,
+          symbol: selectedCrypto.symbol
+        });
+      } else {
+        this.cryptoForm.patchValue({
+          id: '',
+          symbol: ''
+        });
+      }
+    });
   }
 
-  private _filter(value: string): string[] {
+  private _filter(value: string): { id: string; name: string; symbol: string }[] {
     const filterValue = value.toLowerCase();
-    if (!filterValue) {
-      return [];
-    }
+    return this.data.cryptoList.filter(crypto => crypto.name.toLowerCase().includes(filterValue)).slice(0, 20);
+  }
 
-    return this.data.cryptoNames
-      .filter(name => name.toLowerCase().includes(filterValue))
-      .slice(0, 20);
+  displayFn(name?: string): string {
+    return name ? name : '';
   }
 
   onCancel(): void {
@@ -112,15 +132,30 @@ export class CryptoDialogComponent implements OnInit {
   }
 
   onSave(): void {
-    if (this.cryptoControl.valid && this.dateControl.valid) {
-      this.tempData.name = this.cryptoControl.value;
-      this.tempData.date = this.dateControl.value;
+    if (this.cryptoForm.valid) {
+      const formData = this.cryptoForm.getRawValue();
 
-      if (this.tempData.date) {
-        this.tempData.date = this.tempData.date.toISOString();
+      const cryptoData: Crypto = {
+        id: formData.id,
+        name: formData.name,
+        symbol: formData.symbol,
+        quantity: formData.quantity,
+        price: formData.price,
+        purchaseDate: formData.purchaseDate.toISOString(),
+        groupId: formData.groupId,
+      };
+
+      if (this.isEditMode && this.cryptoId) {
+        this.cryptoService.updateCrypto(this.cryptoId, cryptoData).subscribe({
+          next: () => this.dialogRef.close(true),
+          error: (error) => console.error('Error updating crypto:', error)
+        });
+      } else {
+        this.cryptoService.createCrypto(cryptoData).subscribe({
+          next: () => this.dialogRef.close(true),
+          error: (error) => console.error('Error creating crypto:', error)
+        });
       }
-
-      this.dialogRef.close(this.tempData);
     }
   }
 }
