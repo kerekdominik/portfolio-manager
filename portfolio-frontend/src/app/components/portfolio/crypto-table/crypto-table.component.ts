@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {
   MatCell,
@@ -12,8 +12,8 @@ import {
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {CurrencyPipe} from '@angular/common';
-import {EditItemDialogComponent} from '../edit-item-dialog/edit-item-dialog.component';
 import {CryptoPriceService} from '../../services/crypto-price.service';
+import {CryptoDialogComponent} from './crypto-dialog/crypto-dialog.component';
 
 @Component({
   selector: 'app-crypto-table',
@@ -37,16 +37,16 @@ import {CryptoPriceService} from '../../services/crypto-price.service';
   templateUrl: './crypto-table.component.html',
   styleUrl: './crypto-table.component.css'
 })
-export class CryptoTableComponent {
+export class CryptoTableComponent implements OnInit {
   displayedColumns: string[] = ['name', 'price', 'currentPrice', 'quantity', 'group', 'actions'];
   dataSource = [
     { name: 'Bitcoin', price: 50000, currentPrice: 51000, quantity: 2, group: 'Top Cryptos' },
     { name: 'Ethereum', price: 4000, currentPrice: 4200, quantity: 5, group: 'Altcoins' }
-  ]
+  ];
 
   cryptoNames: string[] = [];
 
-  constructor(public dialog: MatDialog, public cryptoService: CryptoPriceService) {}
+  constructor(public dialog: MatDialog, private cryptoService: CryptoPriceService) {}
 
   ngOnInit(): void {
     this.cryptoService.getAllCryptoNames().subscribe(names => {
@@ -54,13 +54,25 @@ export class CryptoTableComponent {
     });
   }
 
-  openEditDialog(element: any): void {
-    const dialogRef = this.dialog.open(EditItemDialogComponent, {
+  openAddDialog(): void {
+    const dialogRef = this.dialog.open(CryptoDialogComponent, {
       width: '300px',
       data: {
-        ...element,
-        fields: ['name', 'price', 'quantity', 'group']
+        cryptoNames: this.cryptoNames
       }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.dataSource = [...this.dataSource, result];
+      }
+    });
+  }
+
+  openEditDialog(element: any): void {
+    const dialogRef = this.dialog.open(CryptoDialogComponent, {
+      width: '300px',
+      data: { element, cryptoNames: this.cryptoNames }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -76,26 +88,5 @@ export class CryptoTableComponent {
 
   delete(element: any): void {
     this.dataSource = this.dataSource.filter(item => item.name !== element.name);
-  }
-
-  openAddDialog() {
-    const dialogRef = this.dialog.open(EditItemDialogComponent, {
-      width: '300px',
-      data: {
-        name: '',
-        price: 0,
-        currentPrice: 0,
-        quantity: 0,
-        group: '',
-        fields: ['name', 'price', 'quantity', 'group'],
-        cryptoNames: this.cryptoNames
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.dataSource = [...this.dataSource, result];
-      }
-    });
   }
 }
