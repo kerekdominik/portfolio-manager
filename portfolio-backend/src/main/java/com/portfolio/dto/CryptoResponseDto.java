@@ -9,6 +9,7 @@ public class CryptoResponseDto {
     private Long id;
     private String name;
     private String symbol;
+    private double currentPrice;
     private double price;
     private double quantity;
     private LocalDate purchaseDate;
