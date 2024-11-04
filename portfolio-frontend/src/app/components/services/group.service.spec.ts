@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CryptoPriceService } from './crypto-price.service';
+import { GroupService } from './group.service';
 
-describe('PriceService', () => {
-  let service: CryptoPriceService;
+describe('GroupServicesService', () => {
+  let service: GroupService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CryptoPriceService);
+    service = TestBed.inject(GroupService);
   });
 
   it('should be created', () => {

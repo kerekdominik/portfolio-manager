@@ -1,5 +1,5 @@
 import {Component, Inject} from '@angular/core';
-import {GroupService} from '../../../services/group-services.service';
+import {GroupService} from '../../../services/group.service';
 import {FormsModule} from '@angular/forms';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
@@ -27,17 +27,17 @@ import {NgIf} from '@angular/common';
     MatDialogActions,
     NgIf
   ],
-  templateUrl: './add-group.component.html',
-  styleUrl: './add-group.component.css'
+  templateUrl: './group-dialog.component.html',
+  styleUrl: './group-dialog.component.css'
 })
-export class AddGroupComponent {
+export class GroupDialogComponent {
   groupName: string = '';
   isEditMode: boolean = false;
   groupId?: number;
 
   constructor(
     private readonly groupService: GroupService,
-    private readonly dialogRef: MatDialogRef<AddGroupComponent>,
+    private readonly dialogRef: MatDialogRef<GroupDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     if (data) {
