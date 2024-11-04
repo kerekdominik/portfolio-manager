@@ -8,6 +8,7 @@ export interface Crypto {
   name: string;
   symbol: string;
   quantity: number;
+  currentPrice: number;
   price: number;
   purchaseDate: string;
   groupId?: number;

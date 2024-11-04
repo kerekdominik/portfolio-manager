@@ -38,7 +38,7 @@ import { CryptoDialogComponent } from './crypto-dialog/crypto-dialog.component';
   styleUrls: ['./crypto-table.component.css']
 })
 export class CryptoTableComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'symbol', 'purchaseDate', 'price', 'quantity', 'groupName', 'actions'];
+  displayedColumns: string[] = ['name', 'symbol', 'purchaseDate', 'price', 'currentPrice', 'quantity', 'groupName', 'actions'];
   dataSource: Crypto[] = [];
   cryptoList: { id: string; name: string, symbol: string }[] = [];
 
