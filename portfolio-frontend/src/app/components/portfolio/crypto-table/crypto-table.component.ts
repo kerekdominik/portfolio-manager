@@ -12,7 +12,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { CryptoPriceService, Crypto } from '../../services/crypto-price.service';
+import { CryptoService, Crypto } from '../../services/crypto.service';
 import { CryptoDialogComponent } from './crypto-dialog/crypto-dialog.component';
 
 @Component({
@@ -44,7 +44,7 @@ export class CryptoTableComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private cryptoService: CryptoPriceService
+    private cryptoService: CryptoService
   ) {}
 
   ngOnInit(): void {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CryptoPriceService } from '../../services/crypto-price.service';
+import { CryptoService } from '../../services/crypto.service';
 import { CurrencyPipe, NgIf } from '@angular/common';
 import { MatCard, MatCardContent, MatCardHeader, MatCardModule } from '@angular/material/card';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -25,7 +25,7 @@ export class DailyCryptoPricesComponent implements OnInit {
   ethCurrentPrice: number | null = null;
   ethOneYearAgoPrice: number | null = null;
 
-  constructor(private priceService: CryptoPriceService) {}
+  constructor(private priceService: CryptoService) {}
 
   ngOnInit(): void {
     this.fetchBtcCurrentPrice();

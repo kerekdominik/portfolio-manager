@@ -18,7 +18,7 @@ export interface Crypto {
 @Injectable({
   providedIn: 'root'
 })
-export class CryptoPriceService {
+export class CryptoService {
   private readonly baseUrl = environment.apiBaseUrl;
 
   constructor(private readonly http: HttpClient) {}

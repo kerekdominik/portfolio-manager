@@ -14,7 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { NgForOf, NgIf, AsyncPipe } from '@angular/common';
 import { map, Observable, startWith } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { Group, GroupService } from '../../../services/group-services.service';
+import { Group, GroupService } from '../../../services/group.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   DateAdapter,
@@ -24,7 +24,7 @@ import {
   NativeDateAdapter
 } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { CryptoPriceService, Crypto } from '../../../services/crypto-price.service';
+import { CryptoService, Crypto } from '../../../services/crypto.service';
 
 @Component({
   selector: 'app-crypto-dialog',
@@ -64,7 +64,7 @@ export class CryptoDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<CryptoDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { element?: Crypto; cryptoList: { id: string; name: string; symbol: string }[] },
     private groupService: GroupService,
-    private cryptoService: CryptoPriceService
+    private cryptoService: CryptoService
   ) {
     this.isEditMode = !!data.element;
 

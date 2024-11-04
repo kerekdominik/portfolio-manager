@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddGroupComponent } from './add-group.component';
+import { StockDialogComponent } from './stock-dialog.component';
 
-describe('AddGroupComponent', () => {
-  let component: AddGroupComponent;
-  let fixture: ComponentFixture<AddGroupComponent>;
+describe('StockDialogComponent', () => {
+  let component: StockDialogComponent;
+  let fixture: ComponentFixture<StockDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddGroupComponent]
+      imports: [StockDialogComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AddGroupComponent);
+    fixture = TestBed.createComponent(StockDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
