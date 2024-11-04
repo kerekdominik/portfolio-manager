@@ -11,8 +11,8 @@ import {
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
-import {AddGroupComponent} from './add-group/add-group.component';
-import {Group, GroupService} from '../../services/group-services.service';
+import {GroupDialogComponent} from './group-dialog/group-dialog.component';
+import {Group, GroupService} from '../../services/group.service';
 
 @Component({
   selector: 'app-groups-table',
@@ -60,7 +60,7 @@ export class GroupsTableComponent {
   }
 
   openAddDialog(): void {
-    const dialogRef = this.dialog.open(AddGroupComponent, {
+    const dialogRef = this.dialog.open(GroupDialogComponent, {
       width: '400px'
     });
 
@@ -72,7 +72,7 @@ export class GroupsTableComponent {
   }
 
   openEditDialog(element: Group): void {
-    const dialogRef = this.dialog.open(AddGroupComponent, {
+    const dialogRef = this.dialog.open(GroupDialogComponent, {
       width: '400px',
       data: { id: element.id, name: element.name }
     });
