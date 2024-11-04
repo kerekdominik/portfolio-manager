@@ -151,6 +151,7 @@ export class CryptoDialogComponent implements OnInit {
         name: formData.name,
         symbol: formData.symbol,
         quantity: formData.quantity,
+        currentPrice: 0,
         price: formData.price,
         purchaseDate: formattedDate,
         groupId: formData.groupId,

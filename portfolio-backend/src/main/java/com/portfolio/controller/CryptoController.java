@@ -12,7 +12,9 @@ import com.portfolio.repository.GroupRepository;
 import com.portfolio.repository.PortfolioAssetRepository;
 import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.service.CryptoService;
+import com.portfolio.service.ExternalCryptoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/crypto")
 @RequiredArgsConstructor
@@ -32,7 +35,9 @@ public class CryptoController {
     private final GroupRepository groupRepository;
     private final CryptoListRepository cryptoListRepository;
     private final PortfolioRepository portfolioRepository;
+
     private final CryptoService cryptoService;
+    private final ExternalCryptoService externalCryptoService;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> addCryptoToPortfolio(
@@ -64,6 +69,14 @@ public class CryptoController {
                 cryptoRequest.getPurchaseDate() != null ? cryptoRequest.getPurchaseDate() : LocalDate.now()
         );
 
+        // Set current price
+        try {
+            portfolioAsset.setCurrentPrice(externalCryptoService.getCryptoPriceInUsd(cryptoRequest.getId()).getPriceInUSD(cryptoRequest.getId()));
+        } catch (Exception e) {
+            log.error("Error fetching current price for crypto", e);
+            throw new RuntimeException(e);
+        }
+
         if (cryptoRequest.getGroupId() != null) {
             groupRepository.findById(cryptoRequest.getGroupId()).ifPresent(portfolioAsset::setGroup);
         }
@@ -83,19 +96,38 @@ public class CryptoController {
         List<CryptoResponseDto> cryptos = assets.stream()
                 .filter(asset -> asset.getAsset() instanceof Crypto)
                 .map(crypto -> {
-                    CryptoResponseDto dto = new CryptoResponseDto();
-                    dto.setId(crypto.getId());
-                    dto.setName(crypto.getAsset().getName());
-                    dto.setSymbol(crypto.getAsset().getSymbol());
-                    dto.setPrice(crypto.getPriceWhenBought());
-                    dto.setQuantity(crypto.getQuantity());
-                    dto.setPurchaseDate(crypto.getPurchaseDate());
-                    dto.setGroupName(crypto.getGroup() != null ? crypto.getGroup().getName() : null);
-                    return dto;
+
+                    try {
+                        Crypto temp = (Crypto) crypto.getAsset();
+
+                        crypto.setCurrentPrice(
+                                externalCryptoService
+                                        .getCryptoPriceInUsd((temp).getExternalId())
+                                        .getPriceInUSD((temp).getExternalId())
+                        );
+                    } catch (Exception e) {
+                        log.error("Error fetching current price for crypto", e);
+                        throw new RuntimeException(e);
+                    }
+
+                    return getCryptoResponseDto(crypto);
                 })
                 .toList();
 
         return ResponseEntity.ok(cryptos);
+    }
+
+    private static CryptoResponseDto getCryptoResponseDto(PortfolioAsset crypto) {
+        CryptoResponseDto dto = new CryptoResponseDto();
+        dto.setId(crypto.getId());
+        dto.setName(crypto.getAsset().getName());
+        dto.setSymbol(crypto.getAsset().getSymbol());
+        dto.setPrice(crypto.getPriceWhenBought());
+        dto.setCurrentPrice(crypto.getCurrentPrice());
+        dto.setQuantity(crypto.getQuantity());
+        dto.setPurchaseDate(crypto.getPurchaseDate());
+        dto.setGroupName(crypto.getGroup() != null ? crypto.getGroup().getName() : null);
+        return dto;
     }
 
     @PutMapping("/{id}")
