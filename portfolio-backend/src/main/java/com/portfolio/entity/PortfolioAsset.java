@@ -35,5 +35,5 @@ public class PortfolioAsset {
     private double quantity;
     private LocalDate purchaseDate;
     private double priceWhenBought;
-    private double priceNow;
+    private double currentPrice;
 }
