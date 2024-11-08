@@ -2,12 +2,10 @@ package com.portfolio.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portfolio.dto.CryptoListItemResponseDto;
-import com.portfolio.entity.asset.Crypto;
 import com.portfolio.entity.asset.external.CryptoListItem;
 import com.portfolio.external.api.crypto.CurrentCryptoResponse;
 import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
 import com.portfolio.repository.CryptoListRepository;
-import com.portfolio.repository.CryptoRepository;
 import com.portfolio.service.ExternalCryptoService;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
@@ -20,14 +18,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class ExternalCryptoServiceImpl implements ExternalCryptoService {
 
-    private final CryptoRepository cryptoRepository;
     private final CryptoListRepository cryptoListRepository;
     private static final String COINGECKO_API_BASE_URL = "https://api.coingecko.com/api/v3";
     private final HttpClient client = HttpClient.newHttpClient();
