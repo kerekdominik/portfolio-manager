@@ -1,5 +1,7 @@
 package com.portfolio.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portfolio.entity.asset.external.StockListItem;
 import com.portfolio.repository.StockListItemRepository;
 import com.portfolio.service.ExternalStockService;
@@ -24,6 +26,10 @@ public class ExternalStockServiceImpl implements ExternalStockService {
     private final StockListItemRepository stockListItemRepository;
     private static final String API_KEY = "P5WLC9QL7WQK2ABZ"; //TODO
     private static final String LISTING_STATUS_URL = "https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=" + API_KEY;
+    private static final String GLOBAL_QUOTE_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=%s&apikey=" + API_KEY;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     @PostConstruct
     public List<StockListItem> fetchAllStocks() throws Exception {
@@ -59,9 +65,26 @@ public class ExternalStockServiceImpl implements ExternalStockService {
             }
         }
 
-        System.out.println("Total stocks retrieved: " + stockList.size());
-
         return stockListItemRepository.saveAll(stockList);
+    }
+
+    public Double getCurrentStockPriceInUSD(String symbol) throws Exception {
+        String urlStr = String.format(GLOBAL_QUOTE_URL, symbol);
+        URL url = new URL(urlStr);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            JsonNode rootNode = objectMapper.readTree(reader);
+            JsonNode globalQuoteNode = rootNode.path("Global Quote");
+
+            if (globalQuoteNode.isMissingNode()) {
+                throw new RuntimeException("No data found for symbol: " + symbol);
+            }
+
+            String priceStr = globalQuoteNode.path("05. price").asText();
+            return Double.parseDouble(priceStr);
+        }
     }
 
     private LocalDate parseDate(String date, DateTimeFormatter formatter) {
