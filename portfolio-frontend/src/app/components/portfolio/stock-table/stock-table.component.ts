@@ -106,7 +106,7 @@ export class StockTableComponent implements OnInit {
   }
 
   delete(element: Stock): void {
-    this.stockService.deleteStock(element.symbol).subscribe({
+    this.stockService.deleteStock(element.id).subscribe({
       next: () => {
         this.loadStocks();
       },
