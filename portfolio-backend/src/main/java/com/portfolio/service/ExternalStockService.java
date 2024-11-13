@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ExternalStockService {
     List<StockListItem> fetchAllStocks() throws Exception;
+    Double getCurrentStockPriceInUSD(String symbol) throws Exception;
 }
