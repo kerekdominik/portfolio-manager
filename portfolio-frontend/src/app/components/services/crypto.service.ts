@@ -41,10 +41,6 @@ export class CryptoService {
     return this.http.get<Crypto[]>(`${this.baseUrl}/crypto`);
   }
 
-  getCryptoById(id: string): Observable<Crypto> {
-    return this.http.get<Crypto>(`${this.baseUrl}/crypto/${id}`);
-  }
-
   createCrypto(crypto: Crypto): Observable<Crypto> {
     return this.http.post<Crypto>(`${this.baseUrl}/crypto`, crypto);
   }
