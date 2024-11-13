@@ -58,7 +58,7 @@ export class StockDialogComponent implements OnInit {
   stockForm: FormGroup;
   filteredStockList: Observable<{ symbol: string; name: string; exchange: string }[]>;
   isEditMode: boolean;
-  stockSymbol?: string;
+  stockId?: string;
 
   constructor(
     public dialogRef: MatDialogRef<StockDialogComponent>,
@@ -70,6 +70,7 @@ export class StockDialogComponent implements OnInit {
 
     this.stockForm = new FormGroup({
       name: new FormControl('', Validators.required),
+      id: new FormControl(''),
       symbol: new FormControl({ value: '', disabled: true }),
       exchange: new FormControl({ value: '', disabled: true }),
       quantity: new FormControl('', Validators.required),
@@ -79,7 +80,7 @@ export class StockDialogComponent implements OnInit {
     });
 
     if (this.isEditMode && data.element) {
-      this.stockSymbol = data.element.symbol;
+      this.stockId = data.element.id;
       this.stockForm.patchValue({
         name: data.element.name,
         symbol: data.element.symbol,
@@ -147,6 +148,7 @@ export class StockDialogComponent implements OnInit {
       const formattedDate = purchaseDate.toISOString().slice(0, 10);
 
       const stockData: Stock = {
+        id: formData.id,
         symbol: formData.symbol,
         name: formData.name,
         exchange: formData.exchange,
@@ -157,8 +159,8 @@ export class StockDialogComponent implements OnInit {
         groupId: formData.groupId,
       };
 
-      if (this.isEditMode && this.stockSymbol) {
-        this.stockService.updateStock(this.stockSymbol, stockData).subscribe({
+      if (this.isEditMode && this.stockId) {
+        this.stockService.updateStock(this.stockId, stockData).subscribe({
           next: () => this.dialogRef.close(true),
           error: (error) => console.error('Error updating stock:', error)
         });
