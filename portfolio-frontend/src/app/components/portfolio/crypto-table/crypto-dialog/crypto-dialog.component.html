@@ -2,7 +2,7 @@
 <form [formGroup]="cryptoForm" (ngSubmit)="onSave()">
   <div mat-dialog-content>
     <!-- Cryptocurrency Name Field -->
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Cryptocurrency Name</mat-label>
       <input
         matInput
@@ -24,7 +24,7 @@
     </mat-form-field>
 
     <!-- Symbol Field (Disabled) -->
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Symbol</mat-label>
       <input
         matInput
@@ -33,7 +33,7 @@
     </mat-form-field>
 
     <!-- Price Field -->
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Price</mat-label>
       <input
         matInput
@@ -47,7 +47,7 @@
     </mat-form-field>
 
     <!-- Quantity Field -->
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Quantity</mat-label>
       <input
         matInput
@@ -61,7 +61,7 @@
     </mat-form-field>
 
     <!-- Purchase Date Field -->
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Purchase Date</mat-label>
       <input
         matInput
@@ -78,7 +78,7 @@
     </mat-form-field>
 
     <!-- Group Field (Optional) -->
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Group</mat-label>
       <mat-select formControlName="groupId">
         <mat-option *ngFor="let group of groups" [value]="group.id">
