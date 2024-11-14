@@ -11,7 +11,7 @@ import com.portfolio.repository.GroupRepository;
 import com.portfolio.repository.PortfolioAssetRepository;
 import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.repository.StockListRepository;
-import com.portfolio.service.StockService;
+import com.portfolio.service.impl.StockService;
 import com.portfolio.service.ExternalStockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
