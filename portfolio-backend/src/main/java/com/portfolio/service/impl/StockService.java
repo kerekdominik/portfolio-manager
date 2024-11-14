@@ -1,4 +1,4 @@
-package com.portfolio.service;
+package com.portfolio.service.impl;
 
 import com.portfolio.entity.asset.Stock;
 import com.portfolio.repository.StockRepository;
