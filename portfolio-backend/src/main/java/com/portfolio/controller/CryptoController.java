@@ -11,7 +11,7 @@ import com.portfolio.repository.CryptoListRepository;
 import com.portfolio.repository.GroupRepository;
 import com.portfolio.repository.PortfolioAssetRepository;
 import com.portfolio.repository.PortfolioRepository;
-import com.portfolio.service.CryptoService;
+import com.portfolio.service.impl.CryptoService;
 import com.portfolio.service.ExternalCryptoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
