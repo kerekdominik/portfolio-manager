@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +40,16 @@ public class PnlCalculationService {
         pnlSummary.put("stockPnl", stockPnl);
 
         return pnlSummary;
+    }
+
+    public Map<String, Double> calculatePnlForGroups(Portfolio portfolio) {
+        List<PortfolioAsset> assets = portfolioAssetRepository.findByPortfolio(portfolio);
+
+        return assets.stream()
+                .filter(asset -> asset.getGroup() != null) // Only consider grouped assets
+                .collect(Collectors.groupingBy(
+                        asset -> asset.getGroup().getName(),
+                        Collectors.summingDouble(asset -> (asset.getCurrentPrice() - asset.getPriceWhenBought()) * asset.getQuantity())
+                ));
     }
 }
