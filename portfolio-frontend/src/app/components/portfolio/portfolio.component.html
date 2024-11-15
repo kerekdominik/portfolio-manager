@@ -5,21 +5,15 @@
     <app-groups-table></app-groups-table>
   </mat-card>
 
-  <mat-grid-list cols="2" rowHeight="1:1">
-    <!-- Cryptos -->
-    <mat-grid-tile class="crypto-tile">
-      <mat-card>
-        <mat-card-title>Cryptos</mat-card-title>
-        <app-crypto-table class="crypto-table"></app-crypto-table>
-      </mat-card>
-    </mat-grid-tile>
+  <!-- Cryptos -->
+  <mat-card class="crypto-card">
+    <mat-card-title>Cryptos</mat-card-title>
+    <app-crypto-table></app-crypto-table>
+  </mat-card>
 
-    <!-- Stocks -->
-    <mat-grid-tile class="stock-tile">
-      <mat-card>
-        <mat-card-title>Stocks</mat-card-title>
-        <app-stock-table class="stock-table"></app-stock-table>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
+  <!-- Stocks -->
+  <mat-card class="stock-card">
+    <mat-card-title>Stocks</mat-card-title>
+    <app-stock-table></app-stock-table>
+  </mat-card>
 </div>
