@@ -12,7 +12,10 @@ public class StockResponseDto {
     private String exchange;
     private double quantity;
     private double price;
+    private double originalValue;
     private double currentPrice;
+    private double currentValue;
+    private double pnl;
     private LocalDate purchaseDate;
     private String groupName;
 }

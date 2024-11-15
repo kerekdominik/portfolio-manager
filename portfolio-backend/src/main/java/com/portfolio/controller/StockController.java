@@ -105,9 +105,12 @@ public class StockController {
         dto.setId(stock.getId());
         dto.setName(stock.getAsset().getName());
         dto.setSymbol(stock.getAsset().getSymbol());
-        dto.setPrice(stock.getPriceWhenBought());
-        dto.setCurrentPrice(stock.getCurrentPrice());
         dto.setQuantity(stock.getQuantity());
+        dto.setPrice(stock.getPriceWhenBought());
+        dto.setOriginalValue(stock.getPriceWhenBought() * stock.getQuantity());
+        dto.setCurrentPrice(stock.getCurrentPrice());
+        dto.setCurrentValue(stock.getCurrentPrice() * stock.getQuantity());
+        dto.setPnl((stock.getCurrentPrice() - stock.getPriceWhenBought()) * stock.getQuantity());
         dto.setPurchaseDate(stock.getPurchaseDate());
         dto.setGroupName(stock.getGroup() != null ? stock.getGroup().getName() : null);
         return dto;

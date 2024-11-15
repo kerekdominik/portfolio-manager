@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import {MatGridList, MatGridTile} from '@angular/material/grid-list';
-import {MatCard} from '@angular/material/card';
 import {DailyCryptoPricesComponent} from './daily-crypto-prices/daily-crypto-prices.component';
 import {PnlDisplayComponent} from './pnl-display/pnl-display.component';
 import {PortfolioCompositionComponent} from './portfolio-composition/portfolio-composition.component';
+import {GroupPnlTableComponent} from './group-pnl-table/group-pnl-table.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,7 +13,8 @@ import {PortfolioCompositionComponent} from './portfolio-composition/portfolio-c
     MatGridTile,
     DailyCryptoPricesComponent,
     PnlDisplayComponent,
-    PortfolioCompositionComponent
+    PortfolioCompositionComponent,
+    GroupPnlTableComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'

@@ -31,8 +31,8 @@ public class PortfolioCompositionService {
         double stockPercentage = (double) stockCount / totalCount * 100;
 
         Map<String, Double> composition = new HashMap<>();
-        composition.put("cryptoPercentage", cryptoPercentage);
-        composition.put("stockPercentage", stockPercentage);
+        composition.put("Crypto", cryptoPercentage);
+        composition.put("Stock", stockPercentage);
 
         return composition;
     }

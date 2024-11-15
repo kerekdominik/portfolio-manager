@@ -122,9 +122,12 @@ public class CryptoController {
         dto.setId(crypto.getId());
         dto.setName(crypto.getAsset().getName());
         dto.setSymbol(crypto.getAsset().getSymbol());
-        dto.setPrice(crypto.getPriceWhenBought());
-        dto.setCurrentPrice(crypto.getCurrentPrice());
         dto.setQuantity(crypto.getQuantity());
+        dto.setPrice(crypto.getPriceWhenBought());
+        dto.setOriginalValue(crypto.getPriceWhenBought() * crypto.getQuantity());
+        dto.setCurrentPrice(crypto.getCurrentPrice());
+        dto.setCurrentValue(crypto.getCurrentPrice() * crypto.getQuantity());
+        dto.setPnl((crypto.getCurrentPrice() - crypto.getPriceWhenBought()) * crypto.getQuantity());
         dto.setPurchaseDate(crypto.getPurchaseDate());
         dto.setGroupName(crypto.getGroup() != null ? crypto.getGroup().getName() : null);
         return dto;
