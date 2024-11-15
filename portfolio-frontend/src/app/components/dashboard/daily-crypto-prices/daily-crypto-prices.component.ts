@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CryptoService } from '../../services/crypto.service';
-import { CurrencyPipe, NgIf } from '@angular/common';
+import {CurrencyPipe, NgClass, NgIf} from '@angular/common';
 import { MatCard, MatCardContent, MatCardHeader, MatCardModule } from '@angular/material/card';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
@@ -14,7 +14,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     MatCardModule,
     MatCardHeader,
     MatCardContent,
-    MatProgressSpinner
+    MatProgressSpinner,
+    NgClass
   ],
   templateUrl: './daily-crypto-prices.component.html',
   styleUrl: './daily-crypto-prices.component.css'

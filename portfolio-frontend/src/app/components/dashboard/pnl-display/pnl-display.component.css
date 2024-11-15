@@ -1,0 +1,36 @@
+.pnl-cards {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.pnl-card {
+  flex: 1;
+  min-width: 250px;
+  max-width: 600px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pnl-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  font-size: 1.2rem;
+  white-space: nowrap;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.positive {
+  color: green;
+}
+
+.negative {
+  color: red;
+}

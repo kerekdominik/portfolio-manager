@@ -1,0 +1,25 @@
+<div class="pnl-cards">
+  <!-- Stock PNL -->
+  <mat-card class="pnl-card">
+    <mat-card-content>
+      <div class="pnl-container" *ngIf="pnlSummary">
+        <span class="label">Stock PNL:</span>
+        <span [ngClass]="{ 'positive': pnlSummary['stockPnl'] >= 0, 'negative': pnlSummary['stockPnl'] < 0 }">
+          {{ pnlSummary['stockPnl'] | currency }}
+        </span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Crypto PNL -->
+  <mat-card class="pnl-card">
+    <mat-card-content>
+      <div class="pnl-container" *ngIf="pnlSummary">
+        <span class="label">Crypto PNL:</span>
+        <span [ngClass]="{ 'positive': pnlSummary['cryptoPnl'] >= 0, 'negative': pnlSummary['cryptoPnl'] < 0 }">
+          {{ pnlSummary['cryptoPnl'] | currency }}
+        </span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
