@@ -85,7 +85,7 @@ export class PortfolioValueBarchartComponent implements OnInit {
                 data: values,
                 itemStyle: {
                   color: (params: any) => {
-                    return params.dataIndex === 0 ? '#9e9e9e' : '#4caf50'; // Grey for Original, Green for Current
+                    return params.dataIndex === 1 ? '#9e9e9e' : '#4caf50'; // Grey for Original, Green for Current
                   }
                 }
               }
