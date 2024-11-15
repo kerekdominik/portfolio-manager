@@ -23,8 +23,20 @@
 
   <!-- Price Column -->
   <ng-container matColumnDef="price">
-    <th mat-header-cell *matHeaderCellDef> Price </th>
+    <th mat-header-cell *matHeaderCellDef> Buying Price </th>
     <td mat-cell *matCellDef="let element"> {{element.price | currency}} </td>
+  </ng-container>
+
+  <!-- Quantity Column -->
+  <ng-container matColumnDef="quantity">
+    <th mat-header-cell *matHeaderCellDef> Quantity </th>
+    <td mat-cell *matCellDef="let element"> {{element.quantity}} </td>
+  </ng-container>
+
+  <!-- Value Column -->
+  <ng-container matColumnDef="originalValue">
+    <th mat-header-cell *matHeaderCellDef> Buying Value </th>
+    <td mat-cell *matCellDef="let element"> {{element.originalValue | currency}} </td>
   </ng-container>
 
   <!-- Current Price Column -->
@@ -33,10 +45,22 @@
     <td mat-cell *matCellDef="let element"> {{element.currentPrice | currency}} </td>
   </ng-container>
 
-  <!-- Quantity Column -->
-  <ng-container matColumnDef="quantity">
-    <th mat-header-cell *matHeaderCellDef> Quantity </th>
-    <td mat-cell *matCellDef="let element"> {{element.quantity}} </td>
+  <!-- Current Value Column -->
+  <ng-container matColumnDef="currentValue">
+    <th mat-header-cell *matHeaderCellDef> Current Value </th>
+    <td mat-cell *matCellDef="let element"> {{element.currentValue | currency}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="pnl">
+    <th mat-header-cell *matHeaderCellDef> PNL </th>
+    <td
+      mat-cell
+      *matCellDef="let element"
+      [ngClass]="element.pnl >= 0 ? 'positive-pnl' : 'negative-pnl'"
+      [style.color]="element.pnl >= 0 ? 'green' : 'red'"
+    >
+      {{ element.pnl | currency }}
+    </td>
   </ng-container>
 
   <!-- Group Column -->

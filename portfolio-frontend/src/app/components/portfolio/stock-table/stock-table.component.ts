@@ -14,7 +14,7 @@ import {
 } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass} from '@angular/common';
 import { StockService, Stock } from '../../services/stock.service';
 import { StockDialogComponent } from './stock-dialog/stock-dialog.component';
 
@@ -35,13 +35,14 @@ import { StockDialogComponent } from './stock-dialog/stock-dialog.component';
     MatRowDef,
     MatHeaderRow,
     MatRow,
-    MatHeaderRowDef
+    MatHeaderRowDef,
+    NgClass
   ],
   templateUrl: './stock-table.component.html',
   styleUrls: ['./stock-table.component.css']
 })
 export class StockTableComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'symbol', 'purchaseDate', 'price', 'currentPrice', 'quantity', 'groupName', 'actions'];
+  displayedColumns: string[] = ['name', 'symbol', 'purchaseDate', 'price', 'quantity', 'originalValue', 'currentPrice', 'currentValue', 'pnl', 'groupName', 'actions'];
   dataSource: Stock[] = [];
   stockList: { symbol: string; name: string; exchange: string }[] = [];
 
