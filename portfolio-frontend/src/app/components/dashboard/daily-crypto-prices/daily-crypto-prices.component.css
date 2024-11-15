@@ -1,19 +1,35 @@
 .price-cards {
   display: flex;
-  justify-content: space-around;
+  flex-direction: row;
   gap: 20px;
-  flex-wrap: wrap;
 }
 
 .price-card {
-  width: 200px;
+  width: 100%;
   text-align: center;
 }
 
-.crypto-logo {
-  width: 30px;
-  height: 30px;
-  margin-right: 8px;
+.price-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.current-price {
+  font-weight: bold;
+}
+
+.price-container .positive {
+  color: green;
+}
+
+.price-container .negative {
+  color: red;
 }
 
 .spinner-container {
