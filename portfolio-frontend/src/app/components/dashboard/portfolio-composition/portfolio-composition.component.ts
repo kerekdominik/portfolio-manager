@@ -43,6 +43,14 @@ export class PortfolioCompositionComponent implements OnInit {
             trigger: 'item',
             formatter: '{a} <br/>{b}: {c} ({d}%)'
           },
+          toolbox: {
+            show: true,
+            feature: {
+              mark: { show: true },
+              dataView: { show: true, readOnly: true },
+              restore: { show: true }
+            }
+          },
           series: [
             {
               name: 'Assets',

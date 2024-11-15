@@ -52,4 +52,14 @@ public class PnlCalculationService {
                         Collectors.summingDouble(asset -> (asset.getCurrentPrice() - asset.getPriceWhenBought()) * asset.getQuantity())
                 ));
     }
+
+    public Map<String, Double> calculatePnlByAsset(Portfolio portfolio) {
+        List<PortfolioAsset> assets = portfolioAssetRepository.findByPortfolio(portfolio);
+
+        return assets.stream()
+                .collect(Collectors.toMap(
+                        asset -> asset.getAsset().getName(),
+                        asset -> (asset.getCurrentPrice() - asset.getPriceWhenBought()) * asset.getQuantity()
+                ));
+    }
 }

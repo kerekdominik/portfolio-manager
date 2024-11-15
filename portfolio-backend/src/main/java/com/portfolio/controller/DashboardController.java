@@ -5,6 +5,7 @@ import com.portfolio.entity.User;
 import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.service.impl.PnlCalculationService;
 import com.portfolio.service.impl.PortfolioCompositionService;
+import com.portfolio.service.impl.PortfolioValueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ public class DashboardController {
 
     private final PnlCalculationService pnlCalculationService;
     private final PortfolioCompositionService portfolioCompositionService;
+    private final PortfolioValueService portfolioValueService;
     private final PortfolioRepository portfolioRepository;
 
     @GetMapping("/pnl-summary")
@@ -48,5 +50,24 @@ public class DashboardController {
 
         Map<String, Double> groupPnl = pnlCalculationService.calculatePnlForGroups(portfolio);
         return ResponseEntity.ok(groupPnl);
+    }
+
+    @GetMapping("/pnl-assets")
+    public ResponseEntity<Map<String, Double>> getPnlByAsset(@AuthenticationPrincipal User user) {
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+
+        Map<String, Double> pnlAssets = pnlCalculationService.calculatePnlByAsset(portfolio);
+
+        return ResponseEntity.ok(pnlAssets);
+    }
+
+    @GetMapping("/portfolio-values")
+    public ResponseEntity<Map<String, Double>> getPortfolioValues(@AuthenticationPrincipal User user) {
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+
+        Map<String, Double> portfolioValues = portfolioValueService.calculatePortfolioValues(portfolio);
+        return ResponseEntity.ok(portfolioValues);
     }
 }
