@@ -40,4 +40,13 @@ public class DashboardController {
         Map<String, Double> composition = portfolioCompositionService.calculateComposition(portfolio);
         return ResponseEntity.ok(composition);
     }
+
+    @GetMapping("/group-pnl")
+    public ResponseEntity<Map<String, Double>> getGroupPnl(@AuthenticationPrincipal User user) {
+        Portfolio portfolio = portfolioRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+
+        Map<String, Double> groupPnl = pnlCalculationService.calculatePnlForGroups(portfolio);
+        return ResponseEntity.ok(groupPnl);
+    }
 }
