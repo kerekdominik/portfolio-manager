@@ -1,20 +1,19 @@
 <div class="dashboard-container">
-  <mat-card>
-    <mat-grid-list cols="4" rowHeight="2:1" gutterSize="10px">
-      <!-- Left Section -->
-      <mat-grid-tile colspan="2" rowspan="2" class="left-section">
-        Left Section
-      </mat-grid-tile>
+  <app-portfolio-composition></app-portfolio-composition>
+  <mat-grid-list cols="4" rowHeight="200px" gutterSize="10px">
+    <!-- Left Section -->
+    <mat-grid-tile colspan="2" rowspan="2" class="left-section">
 
-      <!-- Right Top Section -->
-      <mat-grid-tile colspan="2" class="right-top-section">
-        <app-daily-prices></app-daily-prices>
-      </mat-grid-tile>
+    </mat-grid-tile>
 
-      <!-- Right Bottom Section -->
-      <mat-grid-tile colspan="2" class="right-bottom-section">
-        Right Bottom Section
-      </mat-grid-tile>
-    </mat-grid-list>
-  </mat-card>
+    <!-- Right Top Section -->
+    <mat-grid-tile colspan="2" class="right-top-section">
+      <app-pnl-display></app-pnl-display>
+    </mat-grid-tile>
+
+    <!-- Right Bottom Section -->
+    <mat-grid-tile colspan="2" class="right-bottom-section">
+      <app-daily-prices></app-daily-prices>
+    </mat-grid-tile>
+  </mat-grid-list>
 </div>

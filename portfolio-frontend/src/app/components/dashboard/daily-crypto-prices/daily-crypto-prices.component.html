@@ -2,18 +2,19 @@
   <!-- Bitcoin -->
   <mat-card class="price-card">
     <mat-card-header>
-<!--      <img src="assets/icons/bitcoin-logo.svg" alt="Bitcoin" class="crypto-logo">-->
       <mat-card-title>Bitcoin</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div *ngIf="!btcCurrentPrice || !btcOneYearAgoPrice" class="spinner-container">
         <mat-spinner></mat-spinner>
       </div>
-      <div *ngIf="btcCurrentPrice !== null">
-        <p><strong>Today:</strong> {{ btcCurrentPrice | currency:'USD':'symbol':'1.2-2' }}</p>
-      </div>
-      <div *ngIf="btcOneYearAgoPrice !== null">
-        <p><strong>YTD:</strong> {{ btcOneYearAgoPrice | currency:'USD':'symbol':'1.2-2' }}</p>
+      <div *ngIf="btcCurrentPrice !== null && btcOneYearAgoPrice !== null" class="price-container">
+        <span class="label">Today: </span>
+        <span class="current-price" [ngClass]="{ 'positive': btcCurrentPrice > btcOneYearAgoPrice, 'negative': btcCurrentPrice <= btcOneYearAgoPrice }">
+          {{ btcCurrentPrice | currency:'USD':'symbol':'1.2-2' }}
+        </span>
+        <span class="label">YTD: </span>
+        <span>{{ btcOneYearAgoPrice | currency:'USD':'symbol':'1.2-2' }}</span>
       </div>
     </mat-card-content>
   </mat-card>
@@ -21,18 +22,19 @@
   <!-- Ethereum -->
   <mat-card class="price-card">
     <mat-card-header>
-<!--      <img src="assets/icons/ethereum-logo.svg" alt="Ethereum" class="crypto-logo">-->
       <mat-card-title>Ethereum</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div *ngIf="!ethCurrentPrice || !ethOneYearAgoPrice" class="spinner-container">
         <mat-spinner></mat-spinner>
       </div>
-      <div *ngIf="ethCurrentPrice !== null">
-        <p><strong>Today:</strong> {{ ethCurrentPrice | currency:'USD':'symbol':'1.2-2' }}</p>
-      </div>
-      <div *ngIf="ethOneYearAgoPrice !== null">
-        <p><strong>YTD:</strong> {{ ethOneYearAgoPrice | currency:'USD':'symbol':'1.2-2' }}</p>
+      <div *ngIf="ethCurrentPrice !== null && ethOneYearAgoPrice !== null" class="price-container">
+        <span class="label">Today: </span>
+        <span class="current-price" [ngClass]="{ 'positive': ethCurrentPrice > ethOneYearAgoPrice, 'negative': ethCurrentPrice <= ethOneYearAgoPrice }">
+          {{ ethCurrentPrice | currency:'USD':'symbol':'1.2-2' }}
+        </span>
+        <span class="label">YTD: </span>
+        <span>{{ ethOneYearAgoPrice | currency:'USD':'symbol':'1.2-2' }}</span>
       </div>
     </mat-card-content>
   </mat-card>
