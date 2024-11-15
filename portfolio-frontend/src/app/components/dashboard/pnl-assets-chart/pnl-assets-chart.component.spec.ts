@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GroupPnlTableComponent } from './group-pnl-table.component';
+import { PnlAssetsChartComponent } from './pnl-assets-chart.component';
 
-describe('GroupPnlTableComponent', () => {
-  let component: GroupPnlTableComponent;
-  let fixture: ComponentFixture<GroupPnlTableComponent>;
+describe('PnlAssetsChartComponent', () => {
+  let component: PnlAssetsChartComponent;
+  let fixture: ComponentFixture<PnlAssetsChartComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GroupPnlTableComponent]
+      imports: [PnlAssetsChartComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GroupPnlTableComponent);
+    fixture = TestBed.createComponent(PnlAssetsChartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
