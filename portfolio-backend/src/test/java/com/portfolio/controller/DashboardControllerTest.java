@@ -6,6 +6,7 @@ import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.service.impl.PnlCalculationService;
 import com.portfolio.service.impl.PortfolioCompositionService;
 import com.portfolio.service.impl.PortfolioValueService;
+import com.portfolio.service.impl.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -51,6 +53,13 @@ class DashboardControllerTest {
 
     @MockBean
     private PortfolioRepository portfolioRepository;
+
+    // Mock JwtService and UserDetailsService for security
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private UserDetailsService userDetailsService;
 
     private User testUser;
     private Portfolio testPortfolio;
