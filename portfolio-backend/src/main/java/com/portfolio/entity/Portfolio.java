@@ -24,8 +24,5 @@ public class Portfolio {
     private User user;
 
     @OneToMany(mappedBy = "portfolio")
-    private List<Transaction> transactions;
-
-    @OneToMany(mappedBy = "portfolio")
     private List<PortfolioAsset> portfolioAssets;
 }
