@@ -13,6 +13,8 @@ import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.repository.StockListRepository;
 import com.portfolio.service.impl.StockService;
 import com.portfolio.service.ExternalStockService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/stock")
 @RequiredArgsConstructor
+@Tag(name = "StockController", description = "API for managing stocks in portfolios")
 public class StockController {
 
     private final PortfolioAssetRepository portfolioAssetRepository;
@@ -39,6 +42,7 @@ public class StockController {
     private final ExternalStockService externalStockService;
 
     @PostMapping
+    @Operation(summary = "Add stock to portfolio", description = "Adds a new stock to the user's portfolio.")
     public ResponseEntity<Map<String, String>> addStockToPortfolio(
             @RequestBody StockRequestDto stockRequest,
             @AuthenticationPrincipal User user) {
@@ -85,6 +89,7 @@ public class StockController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all stocks in portfolio", description = "Retrieves all stocks in the user's portfolio.")
     public ResponseEntity<List<StockResponseDto>> getAllStocksInPortfolio(
             @AuthenticationPrincipal User user) {
 
@@ -100,23 +105,8 @@ public class StockController {
         return ResponseEntity.ok(stocks);
     }
 
-    private StockResponseDto getStockResponseDto(PortfolioAsset stock) {
-        StockResponseDto dto = new StockResponseDto();
-        dto.setId(stock.getId());
-        dto.setName(stock.getAsset().getName());
-        dto.setSymbol(stock.getAsset().getSymbol());
-        dto.setQuantity(stock.getQuantity());
-        dto.setPrice(stock.getPriceWhenBought());
-        dto.setOriginalValue(stock.getPriceWhenBought() * stock.getQuantity());
-        dto.setCurrentPrice(stock.getCurrentPrice());
-        dto.setCurrentValue(stock.getCurrentPrice() * stock.getQuantity());
-        dto.setPnl((stock.getCurrentPrice() - stock.getPriceWhenBought()) * stock.getQuantity());
-        dto.setPurchaseDate(stock.getPurchaseDate());
-        dto.setGroupName(stock.getGroup() != null ? stock.getGroup().getName() : null);
-        return dto;
-    }
-
     @PutMapping("/{id}")
+    @Operation(summary = "Update stock in portfolio", description = "Updates the details of a stock in the user's portfolio.")
     public ResponseEntity<Map<String, String>> updateStockInPortfolio(
             @PathVariable Long id,
             @RequestBody StockRequestDto stockRequest,
@@ -143,6 +133,7 @@ public class StockController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete stock from portfolio", description = "Removes a stock from the user's portfolio.")
     public ResponseEntity<Map<String, String>> deleteStockFromPortfolio(
             @PathVariable Long id,
             @AuthenticationPrincipal User user) {
@@ -157,5 +148,21 @@ public class StockController {
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Stock asset not found"));
+    }
+
+    private StockResponseDto getStockResponseDto(PortfolioAsset stock) {
+        StockResponseDto dto = new StockResponseDto();
+        dto.setId(stock.getId());
+        dto.setName(stock.getAsset().getName());
+        dto.setSymbol(stock.getAsset().getSymbol());
+        dto.setQuantity(stock.getQuantity());
+        dto.setPrice(stock.getPriceWhenBought());
+        dto.setOriginalValue(stock.getPriceWhenBought() * stock.getQuantity());
+        dto.setCurrentPrice(stock.getCurrentPrice());
+        dto.setCurrentValue(stock.getCurrentPrice() * stock.getQuantity());
+        dto.setPnl((stock.getCurrentPrice() - stock.getPriceWhenBought()) * stock.getQuantity());
+        dto.setPurchaseDate(stock.getPurchaseDate());
+        dto.setGroupName(stock.getGroup() != null ? stock.getGroup().getName() : null);
+        return dto;
     }
 }

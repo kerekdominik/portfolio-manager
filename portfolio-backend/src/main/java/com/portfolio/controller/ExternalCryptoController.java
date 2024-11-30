@@ -4,6 +4,8 @@ import com.portfolio.external.api.crypto.CurrentCryptoResponse;
 import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
 import com.portfolio.repository.CryptoListRepository;
 import com.portfolio.service.ExternalCryptoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +18,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/crypto")
 @RequiredArgsConstructor
+@Tag(name = "ExternalCryptoController", description = "API for external cryptocurrency data")
 public class ExternalCryptoController {
 
     private final ExternalCryptoService externalCryptoService;
     private final CryptoListRepository cryptoListRepository;
 
     @GetMapping("/list")
+    @Operation(
+            summary = "Retrieve all cryptocurrency details",
+            description = "Fetches a list of all available cryptocurrencies from the database, including their ID, name, and symbol."
+    )
     public ResponseEntity<List<Map<String, String>>> getAllCryptoDetails() {
         List<Map<String, String>> cryptoDetails = cryptoListRepository.findAll()
                 .stream()
@@ -37,6 +44,10 @@ public class ExternalCryptoController {
     }
 
     @GetMapping("/current/price")
+    @Operation(
+            summary = "Get current cryptocurrency price",
+            description = "Retrieves the current price of a specific cryptocurrency in USD by its ID."
+    )
     public ResponseEntity<Map<String, Object>> getCryptoPrice(@RequestParam String id) {
         try {
             CurrentCryptoResponse currentCryptoResponse = externalCryptoService.getCryptoPriceInUsd(id.toLowerCase());
@@ -60,6 +71,10 @@ public class ExternalCryptoController {
     }
 
     @GetMapping("/historical/price")
+    @Operation(
+            summary = "Get historical cryptocurrency price",
+            description = "Retrieves the historical price of a specific cryptocurrency in USD on a given date."
+    )
     public ResponseEntity<Map<String, Object>> getHistoricalPrice(@RequestParam String id, @RequestParam String date) {
         try {
             HistoricalCryptoResponse historicalCryptoResponse = externalCryptoService.getHistoricalPrice(id.toLowerCase(), date);
