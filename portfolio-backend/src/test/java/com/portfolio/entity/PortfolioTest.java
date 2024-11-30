@@ -10,13 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PortfolioTest {
     private User mockUser;
-    private List<Transaction> mockTransactions;
     private List<PortfolioAsset> mockPortfolioAssets;
 
     @BeforeEach
     void setUp() {
         mockUser = Mockito.mock(User.class);
-        mockTransactions = List.of(Mockito.mock(Transaction.class));
         mockPortfolioAssets = List.of(Mockito.mock(PortfolioAsset.class));
     }
 
@@ -28,11 +26,10 @@ class PortfolioTest {
 
     @Test
     void testAllArgsConstructor() {
-        Portfolio portfolio = new Portfolio(1L, mockUser, mockTransactions, mockPortfolioAssets);
+        Portfolio portfolio = new Portfolio(1L, mockUser, mockPortfolioAssets);
 
         assertEquals(1L, portfolio.getId());
         assertEquals(mockUser, portfolio.getUser());
-        assertEquals(mockTransactions, portfolio.getTransactions());
         assertEquals(mockPortfolioAssets, portfolio.getPortfolioAssets());
     }
 
@@ -42,12 +39,10 @@ class PortfolioTest {
 
         portfolio.setId(1L);
         portfolio.setUser(mockUser);
-        portfolio.setTransactions(mockTransactions);
         portfolio.setPortfolioAssets(mockPortfolioAssets);
 
         assertEquals(1L, portfolio.getId());
         assertEquals(mockUser, portfolio.getUser());
-        assertEquals(mockTransactions, portfolio.getTransactions());
         assertEquals(mockPortfolioAssets, portfolio.getPortfolioAssets());
     }
 }
