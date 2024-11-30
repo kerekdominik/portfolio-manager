@@ -13,6 +13,8 @@ import com.portfolio.repository.PortfolioAssetRepository;
 import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.service.impl.CryptoService;
 import com.portfolio.service.ExternalCryptoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,17 +31,18 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/crypto")
 @RequiredArgsConstructor
+@Tag(name = "CryptoController", description = "API for managing cryptocurrencies in portfolios")
 public class CryptoController {
 
     private final PortfolioAssetRepository portfolioAssetRepository;
     private final GroupRepository groupRepository;
     private final CryptoListRepository cryptoListRepository;
     private final PortfolioRepository portfolioRepository;
-
     private final CryptoService cryptoService;
     private final ExternalCryptoService externalCryptoService;
 
     @PostMapping
+    @Operation(summary = "Add cryptocurrency to portfolio", description = "Adds a new cryptocurrency to the user's portfolio.")
     public ResponseEntity<Map<String, String>> addCryptoToPortfolio(
             @RequestBody CryptoRequestDto cryptoRequest,
             @AuthenticationPrincipal User user) {
@@ -53,7 +56,7 @@ public class CryptoController {
         }
 
         Crypto crypto = new Crypto(
-                cryptoListItemOpt.get().getId(),         // CoinGecko ID
+                cryptoListItemOpt.get().getId(), // CoinGecko ID
                 cryptoListItemOpt.get().getName(),
                 cryptoListItemOpt.get().getSymbol()
         );
@@ -86,6 +89,7 @@ public class CryptoController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all cryptocurrencies in portfolio", description = "Retrieves all cryptocurrencies in the user's portfolio.")
     public ResponseEntity<List<CryptoResponseDto>> getAllCryptosInPortfolio(
             @AuthenticationPrincipal User user) {
 
@@ -96,14 +100,10 @@ public class CryptoController {
         List<CryptoResponseDto> cryptos = assets.stream()
                 .filter(asset -> asset.getAsset() instanceof Crypto)
                 .map(crypto -> {
-
                     try {
                         Crypto temp = (Crypto) crypto.getAsset();
-
                         crypto.setCurrentPrice(
-                                externalCryptoService
-                                        .getCryptoPriceInUsd((temp).getExternalId())
-                                        .getPriceInUSD((temp).getExternalId())
+                                externalCryptoService.getCryptoPriceInUsd(temp.getExternalId()).getPriceInUSD(temp.getExternalId())
                         );
                     } catch (Exception e) {
                         log.error("Error fetching current price for crypto", e);
@@ -117,23 +117,8 @@ public class CryptoController {
         return ResponseEntity.ok(cryptos);
     }
 
-    private static CryptoResponseDto getCryptoResponseDto(PortfolioAsset crypto) {
-        CryptoResponseDto dto = new CryptoResponseDto();
-        dto.setId(crypto.getId());
-        dto.setName(crypto.getAsset().getName());
-        dto.setSymbol(crypto.getAsset().getSymbol());
-        dto.setQuantity(crypto.getQuantity());
-        dto.setPrice(crypto.getPriceWhenBought());
-        dto.setOriginalValue(crypto.getPriceWhenBought() * crypto.getQuantity());
-        dto.setCurrentPrice(crypto.getCurrentPrice());
-        dto.setCurrentValue(crypto.getCurrentPrice() * crypto.getQuantity());
-        dto.setPnl((crypto.getCurrentPrice() - crypto.getPriceWhenBought()) * crypto.getQuantity());
-        dto.setPurchaseDate(crypto.getPurchaseDate());
-        dto.setGroupName(crypto.getGroup() != null ? crypto.getGroup().getName() : null);
-        return dto;
-    }
-
     @PutMapping("/{id}")
+    @Operation(summary = "Update cryptocurrency in portfolio", description = "Updates the details of a cryptocurrency in the user's portfolio.")
     public ResponseEntity<Map<String, String>> updateCryptoInPortfolio(
             @PathVariable Long id,
             @RequestBody CryptoRequestDto cryptoRequest,
@@ -160,6 +145,7 @@ public class CryptoController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete cryptocurrency from portfolio", description = "Removes a cryptocurrency from the user's portfolio.")
     public ResponseEntity<Map<String, String>> deleteCryptoFromPortfolio(
             @PathVariable Long id,
             @AuthenticationPrincipal User user) {
@@ -174,5 +160,21 @@ public class CryptoController {
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Crypto asset not found"));
+    }
+
+    private static CryptoResponseDto getCryptoResponseDto(PortfolioAsset crypto) {
+        CryptoResponseDto dto = new CryptoResponseDto();
+        dto.setId(crypto.getId());
+        dto.setName(crypto.getAsset().getName());
+        dto.setSymbol(crypto.getAsset().getSymbol());
+        dto.setQuantity(crypto.getQuantity());
+        dto.setPrice(crypto.getPriceWhenBought());
+        dto.setOriginalValue(crypto.getPriceWhenBought() * crypto.getQuantity());
+        dto.setCurrentPrice(crypto.getCurrentPrice());
+        dto.setCurrentValue(crypto.getCurrentPrice() * crypto.getQuantity());
+        dto.setPnl((crypto.getCurrentPrice() - crypto.getPriceWhenBought()) * crypto.getQuantity());
+        dto.setPurchaseDate(crypto.getPurchaseDate());
+        dto.setGroupName(crypto.getGroup() != null ? crypto.getGroup().getName() : null);
+        return dto;
     }
 }
