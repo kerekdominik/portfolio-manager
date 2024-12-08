@@ -1,7 +1,7 @@
 package com.portfolio.controller;
 
-import com.portfolio.external.api.crypto.CurrentCryptoResponse;
-import com.portfolio.external.api.crypto.HistoricalCryptoResponse;
+import com.portfolio.dto.external.api.crypto.CurrentCryptoResponse;
+import com.portfolio.dto.external.api.crypto.HistoricalCryptoResponse;
 import com.portfolio.repository.CryptoListRepository;
 import com.portfolio.service.ExternalCryptoService;
 import io.swagger.v3.oas.annotations.Operation;
