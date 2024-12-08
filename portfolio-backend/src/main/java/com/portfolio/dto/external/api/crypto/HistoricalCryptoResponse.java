@@ -1,4 +1,4 @@
-package com.portfolio.external.api.crypto;
+package com.portfolio.dto.external.api.crypto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
