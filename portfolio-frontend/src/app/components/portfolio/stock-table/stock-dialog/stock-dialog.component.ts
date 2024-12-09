@@ -140,7 +140,7 @@ export class StockDialogComponent implements OnInit {
   }
 
   displayFn(name?: string): string {
-    return name ? name : '';
+    return name ?? '';
   }
 
   onCancel(): void {

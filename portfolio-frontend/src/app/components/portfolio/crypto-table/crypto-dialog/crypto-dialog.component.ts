@@ -135,7 +135,7 @@ export class CryptoDialogComponent implements OnInit {
   }
 
   displayFn(name?: string): string {
-    return name ? name : '';
+    return name ?? '';
   }
 
   onCancel(): void {
