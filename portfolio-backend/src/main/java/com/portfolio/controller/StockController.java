@@ -121,11 +121,16 @@ public class StockController {
         }
 
         PortfolioAsset portfolioAsset = portfolioAssetOpt.get();
+        portfolioAsset.setPriceWhenBought(stockRequest.getPrice());
         portfolioAsset.setQuantity(stockRequest.getQuantity());
-        portfolioAsset.setPurchaseDate(stockRequest.getPurchaseDate());
+        portfolioAsset.setPurchaseDate(
+                stockRequest.getPurchaseDate() != null ? stockRequest.getPurchaseDate() : LocalDate.now()
+        );
 
         if (stockRequest.getGroupId() != null) {
             groupRepository.findById(stockRequest.getGroupId()).ifPresent(portfolioAsset::setGroup);
+        } else {
+            portfolioAsset.setGroup(null);
         }
 
         portfolioAssetRepository.save(portfolioAsset);
