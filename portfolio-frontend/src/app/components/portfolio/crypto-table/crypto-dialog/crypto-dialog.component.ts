@@ -63,8 +63,8 @@ export class CryptoDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<CryptoDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { element?: Crypto; cryptoList: { id: string; name: string; symbol: string }[] },
-    private groupService: GroupService,
-    private cryptoService: CryptoService
+    private readonly groupService: GroupService,
+    private readonly cryptoService: CryptoService
   ) {
     this.isEditMode = !!data.element;
 
@@ -78,19 +78,6 @@ export class CryptoDialogComponent implements OnInit {
       groupId: new FormControl(''),
     });
 
-    if (this.isEditMode && data.element) {
-      this.cryptoId = data.element.id;
-      this.cryptoForm.patchValue({
-        name: data.element.name,
-        id: data.element.id,
-        symbol: data.element.symbol,
-        quantity: data.element.quantity,
-        price: data.element.price,
-        purchaseDate: new Date(data.element.purchaseDate),
-        groupId: data.element.groupId,
-      });
-    }
-
     this.filteredCryptoList = new Observable<{ id: string; name: string; symbol: string }[]>();
   }
 
@@ -98,6 +85,23 @@ export class CryptoDialogComponent implements OnInit {
     this.groupService.getAllGroups().subscribe({
       next: (groups) => {
         this.groups = groups;
+
+        if (this.isEditMode && this.data.element) {
+          const selectedGroup = this.data.element.groupName
+            ? this.groups.find(g => g.name === this.data.element!.groupName)
+            : undefined;
+
+          this.cryptoId = this.data.element.id;
+          this.cryptoForm.patchValue({
+            name: this.data.element.name,
+            id: this.data.element.id,
+            symbol: this.data.element.symbol,
+            quantity: this.data.element.quantity,
+            price: this.data.element.price,
+            purchaseDate: new Date(this.data.element.purchaseDate),
+            groupId: selectedGroup ? selectedGroup.id : ''
+          });
+        }
       },
       error: (error) => {
         console.error('Error fetching groups:', error);
@@ -115,12 +119,12 @@ export class CryptoDialogComponent implements OnInit {
         this.cryptoForm.patchValue({
           id: selectedCrypto.id,
           symbol: selectedCrypto.symbol
-        });
+        }, {emitEvent: false});
       } else {
         this.cryptoForm.patchValue({
           id: '',
           symbol: ''
-        });
+        }, {emitEvent: false});
       }
     });
   }
@@ -131,7 +135,7 @@ export class CryptoDialogComponent implements OnInit {
   }
 
   displayFn(name?: string): string {
-    return name ? name : '';
+    return name ?? '';
   }
 
   onCancel(): void {
