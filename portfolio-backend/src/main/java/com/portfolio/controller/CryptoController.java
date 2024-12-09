@@ -133,11 +133,16 @@ public class CryptoController {
         }
 
         PortfolioAsset portfolioAsset = portfolioAssetOpt.get();
+        portfolioAsset.setPriceWhenBought(cryptoRequest.getPrice());
         portfolioAsset.setQuantity(cryptoRequest.getQuantity());
-        portfolioAsset.setPurchaseDate(cryptoRequest.getPurchaseDate());
+        portfolioAsset.setPurchaseDate(
+                cryptoRequest.getPurchaseDate() != null ? cryptoRequest.getPurchaseDate() : LocalDate.now()
+        );
 
         if (cryptoRequest.getGroupId() != null) {
             groupRepository.findById(cryptoRequest.getGroupId()).ifPresent(portfolioAsset::setGroup);
+        } else {
+            portfolioAsset.setGroup(null);
         }
 
         portfolioAssetRepository.save(portfolioAsset);
