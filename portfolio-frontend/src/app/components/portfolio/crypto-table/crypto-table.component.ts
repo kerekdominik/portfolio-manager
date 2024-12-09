@@ -45,7 +45,7 @@ export class CryptoTableComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private cryptoService: CryptoService
+    private readonly cryptoService: CryptoService
   ) {}
 
   ngOnInit(): void {

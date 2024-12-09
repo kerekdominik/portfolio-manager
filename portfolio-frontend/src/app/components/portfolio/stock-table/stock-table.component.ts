@@ -48,7 +48,7 @@ export class StockTableComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private stockService: StockService
+    private readonly stockService: StockService
   ) {}
 
   ngOnInit(): void {

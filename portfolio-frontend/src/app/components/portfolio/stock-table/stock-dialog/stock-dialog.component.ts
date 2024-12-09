@@ -63,8 +63,8 @@ export class StockDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<StockDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { element?: Stock; stockList: { symbol: string; name: string; exchange: string }[] },
-    private groupService: GroupService,
-    private stockService: StockService
+    private readonly groupService: GroupService,
+    private readonly stockService: StockService
   ) {
     this.isEditMode = !!data.element;
 
@@ -81,15 +81,6 @@ export class StockDialogComponent implements OnInit {
 
     if (this.isEditMode && data.element) {
       this.stockId = data.element.id;
-      this.stockForm.patchValue({
-        name: data.element.name,
-        symbol: data.element.symbol,
-        exchange: data.element.exchange,
-        quantity: data.element.quantity,
-        price: data.element.price,
-        purchaseDate: new Date(data.element.purchaseDate),
-        groupId: data.element.groupId,
-      });
     }
 
     this.filteredStockList = new Observable<{ symbol: string; name: string; exchange: string }[]>();
@@ -99,6 +90,23 @@ export class StockDialogComponent implements OnInit {
     this.groupService.getAllGroups().subscribe({
       next: (groups) => {
         this.groups = groups;
+
+        if (this.isEditMode && this.data.element) {
+          const selectedGroup = this.data.element.groupName
+            ? this.groups.find(g => g.name === this.data.element!.groupName)
+            : undefined;
+
+          this.stockForm.patchValue({
+            name: this.data.element.name,
+            id: this.data.element.id,
+            symbol: this.data.element.symbol,
+            exchange: this.data.element.exchange,
+            quantity: this.data.element.quantity,
+            price: this.data.element.price,
+            purchaseDate: new Date(this.data.element.purchaseDate),
+            groupId: selectedGroup ? selectedGroup.id : ''
+          });
+        }
       },
       error: (error) => {
         console.error('Error fetching groups:', error);
@@ -116,12 +124,12 @@ export class StockDialogComponent implements OnInit {
         this.stockForm.patchValue({
           symbol: selectedStock.symbol,
           exchange: selectedStock.exchange
-        });
+        }, {emitEvent: false});
       } else {
         this.stockForm.patchValue({
           symbol: '',
           exchange: ''
-        });
+        }, {emitEvent: false});
       }
     });
   }
@@ -132,7 +140,7 @@ export class StockDialogComponent implements OnInit {
   }
 
   displayFn(name?: string): string {
-    return name ? name : '';
+    return name ?? '';
   }
 
   onCancel(): void {
