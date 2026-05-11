@@ -1,14 +1,14 @@
 [versions]
-springframework-boot = "3.3.3"
-spring-dependency-management = "1.1.6"
-sonarqube = "4.4.1.3373"
+springframework-boot = "4.0.6"
+spring-dependency-management = "1.1.7"
+sonarqube = "7.3.0.8198"
 
-springdoc-openapi-starter-webmvc-ui = "2.6.0"
-jjwt-api="0.11.5"
-jjwt-impl="0.11.5"
-jjwt-jackson="0.11.5"
-mapstruct = "1.5.3.Final"
-caffeine = "3.1.3"
+springdoc-openapi-starter-webmvc-ui = "3.0.3"
+jjwt-api="0.13.0"
+jjwt-impl="0.13.0"
+jjwt-jackson="0.13.0"
+mapstruct = "1.6.3"
+caffeine = "3.2.4"
 
 [libraries]
 # BOM dependencies
