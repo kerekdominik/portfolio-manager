@@ -1,0 +1,78 @@
+name: Docker images
+
+# Builds the backend and frontend images.
+#  - pull requests: build only, nothing is pushed and no secrets are used (safe for fork PRs)
+#  - push to main: build and publish to ghcr.io/<owner>/portfolio-manager-<component> (tags: latest, sha-<short>)
+#  - manual run: build, and publish only when started on main
+# The server pulls the images itself (docker compose pull), nothing is deployed from here.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'portfolio-backend/**'
+      - 'portfolio-frontend/**'
+      - '.github/workflows/docker-images.yml'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'portfolio-backend/**'
+      - 'portfolio-frontend/**'
+      - '.github/workflows/docker-images.yml'
+  workflow_dispatch:
+
+# no write access by default, the job below asks for exactly what it needs
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-images-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  REGISTRY: ghcr.io
+  PUBLISH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+
+jobs:
+  image:
+    name: ${{ matrix.component }} image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # only used when publishing; fork pull requests always get a read-only token
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr.io
+        if: env.PUBLISH == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image name, tags and labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/portfolio-manager-${{ matrix.component }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=sha-,format=short
+
+      - name: Build${{ env.PUBLISH == 'true' && ' and push' || '' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ./portfolio-${{ matrix.component }}
+          push: ${{ env.PUBLISH == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.component }}
+          cache-to: type=gha,scope=${{ matrix.component }},mode=max
