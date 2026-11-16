@@ -14,4 +14,4 @@ Track your investments: stocks and cryptocurrencies, grouped, with profit and lo
 cp .env.example .env        # set DB_PASSWORD and JWT_SECRET_KEY (openssl rand -base64 64)
 docker compose up -d --build
 ```
-Open <http://localhost:8082>. The data is kept in a Docker volume across restarts. Details, ports and backups: [Running in containers](portfolio-backend/README.md#running-in-containers).
+Open <http://localhost:8082>. The data is kept in a Docker volume across restarts. Prebuilt images are published to ghcr.io by CI (`docker compose pull` instead of `--build`). Details, ports and backups: [Running in containers](portfolio-backend/README.md#running-in-containers).
