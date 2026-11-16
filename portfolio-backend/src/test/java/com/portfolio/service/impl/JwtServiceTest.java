@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.lang.reflect.Field;
+import java.time.Clock;
 import java.util.Date;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        jwtService = new JwtService();
+        jwtService = new JwtService(Clock.systemUTC());
 
         // Inject the secretKey into the jwtService instance using reflection
         Field secretKeyField = JwtService.class.getDeclaredField("secretKey");

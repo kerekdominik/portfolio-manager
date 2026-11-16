@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
         scheme = "bearer",
         bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER
-        // TODO: Add oauth2 scheme
+        // Google sign-in also ends in a JWT, so bearer auth is the only scheme the API itself needs.
 )
 public class OpenApiConfig {
 

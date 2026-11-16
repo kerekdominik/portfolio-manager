@@ -23,6 +23,8 @@ import java.util.Map;
 @Tag(name = "DashboardController", description = "API for dashboard-related operations")
 public class DashboardController {
 
+    private static final String PORTFOLIO_NOT_FOUND = "Portfolio not found for user";
+
     private final PnlCalculationService pnlCalculationService;
     private final PortfolioCompositionService portfolioCompositionService;
     private final PortfolioValueService portfolioValueService;
@@ -32,7 +34,7 @@ public class DashboardController {
     @Operation(summary = "Get PNL summary", description = "Calculates and returns the total profit or loss for stocks and cryptocurrencies in the portfolio.")
     public ResponseEntity<Map<String, Double>> getPnlSummary(@AuthenticationPrincipal User user) {
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         Map<String, Double> pnlSummary = pnlCalculationService.calculatePnlForPortfolio(portfolio);
         return ResponseEntity.ok(pnlSummary);
@@ -42,7 +44,7 @@ public class DashboardController {
     @Operation(summary = "Get portfolio composition", description = "Returns the portfolio composition by asset types (e.g., percentage of stocks vs cryptocurrencies).")
     public ResponseEntity<Map<String, Double>> getPortfolioComposition(@AuthenticationPrincipal User user) {
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         Map<String, Double> composition = portfolioCompositionService.calculateComposition(portfolio);
         return ResponseEntity.ok(composition);
@@ -52,7 +54,7 @@ public class DashboardController {
     @Operation(summary = "Get group-wise PNL", description = "Calculates and returns profit or loss for each asset group in the portfolio.")
     public ResponseEntity<Map<String, Double>> getGroupPnl(@AuthenticationPrincipal User user) {
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         Map<String, Double> groupPnl = pnlCalculationService.calculatePnlForGroups(portfolio);
         return ResponseEntity.ok(groupPnl);
@@ -62,7 +64,7 @@ public class DashboardController {
     @Operation(summary = "Get asset-wise PNL", description = "Returns profit or loss for each individual asset in the portfolio.")
     public ResponseEntity<Map<String, Double>> getPnlByAsset(@AuthenticationPrincipal User user) {
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         Map<String, Double> pnlAssets = pnlCalculationService.calculatePnlByAsset(portfolio);
         return ResponseEntity.ok(pnlAssets);
@@ -72,7 +74,7 @@ public class DashboardController {
     @Operation(summary = "Get portfolio values", description = "Returns the original value and current value of the entire portfolio.")
     public ResponseEntity<Map<String, Double>> getPortfolioValues(@AuthenticationPrincipal User user) {
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         Map<String, Double> portfolioValues = portfolioValueService.calculatePortfolioValues(portfolio);
         return ResponseEntity.ok(portfolioValues);

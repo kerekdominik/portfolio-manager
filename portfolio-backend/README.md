@@ -20,6 +20,7 @@ REST API of **portfolio-manager**, an application for tracking an investment por
 - [Testing and quality](#testing-and-quality)
 - [Code conventions](#code-conventions)
 - [Project structure](#project-structure)
+- [Dependencies](#dependencies)
 - [Known limitations](#known-limitations)
 
 ---
@@ -213,7 +214,8 @@ erDiagram
 
 ## Testing and quality
 - JUnit 5, Mockito and Spring Security Test. Tests use an in-memory **H2** database configured in `src/test/resources/application-test.properties`.
-- Coverage is measured with JaCoCo. Reports are written to `build/reports/jacoco/test/html/index.html` and as XML for Sonar.
+- Coverage is measured with JaCoCo. Reports are written to `build/reports/jacoco/test/html/index.html` and as XML for Sonar. Line coverage is close to 100%; keep it there by adding tests with every change.
+- External APIs are never called in tests: the CoinGecko and Alpha Vantage clients take an injectable `HttpClient`, so tests pass a Mockito mock.
 - CI ([`.github/workflows`](../.github/workflows)) runs `./gradlew build jacocoTestReport sonar` for backend changes on every push to `main` and on pull requests (the frontend has its own workflow and SonarCloud project, `portfolio-manager-frontend`), publishing results to [SonarCloud](https://sonarcloud.io) (project `portfolio-manager-backend`). It needs the repository secrets `SONAR_TOKEN` and `JWT_SECRET_KEY`.
 
 ### Running tests
@@ -230,7 +232,8 @@ On Windows use `gradlew.bat`. Coverage reports are written to `build/reports/jac
    - `@BeforeEach` for setup, test methods named `test...` plus the behaviour, Arrange-Act-Assert structure.
    - **Entity tests:** constructors, getters/setters, `equals`/`hashCode`, `toString`.
    - **Service tests:** mock dependencies with Mockito.
-   - **Controller tests:** `@ExtendWith(SpringExtension.class)` and mocked services.
+   - **Controller tests:** plain Mockito unit tests that call the controller methods directly (see `CryptoControllerTest`). Pass a fixed `Clock` when the code uses today's date.
+   - **Security tests:** `SecurityConfigTest` runs the real filter chain in a `@WebMvcTest` slice.
 
 Example entity test:
 ```java
@@ -259,6 +262,8 @@ class CryptoListItemTest {
 ## Code conventions
 - Lombok removes boilerplate. Entities carry JPA annotations, DTOs cross the layer boundaries, MapStruct converts between them.
 - Services that need to be mocked or swapped are implemented behind interfaces.
+- Failures of external market data APIs are reported as `ExternalApiException`; do not throw or declare plain `Exception`/`RuntimeException`.
+- Get the current date and time from the injected `Clock` bean (`LocalDate.now(clock)`), never from the system default.
 - Where to look: caching in `CacheConfig`, OpenAPI in `OpenApiConfig`, security in `SecurityConfig`, `JwtAuthFilter` and `OAuth2SuccessHandler`.
 - Debugging: `DEBUG` logging for Spring Security and Web is on by default, tune it in `application.properties`.
 
@@ -271,6 +276,7 @@ src/main/java/com/portfolio
 │   └── security/       # SecurityConfig, JwtAuthFilter, OAuth2SuccessHandler, AuthEntryPoint
 ├── controller/         # REST controllers (auth, user, stock, crypto, groups, dashboard)
 ├── dto/                # Request/response objects, external API responses
+├── exception/          # Application exceptions (ExternalApiException)
 ├── entity/             # JPA entities, asset hierarchy, enums
 ├── mapper/             # MapStruct mappers
 ├── repository/         # Spring Data JPA repositories
@@ -278,6 +284,13 @@ src/main/java/com/portfolio
     ├── (interfaces)    # ExternalCryptoService, ExternalStockService
     └── impl/           # Auth, JWT, OAuth2, Crypto, Stock, PnL, composition, value, external clients
 ```
+
+## Dependencies
+Dependency versions are pinned in `gradle.lockfile`, and every downloaded artifact is checked against the SHA-256 checksums in `gradle/verification-metadata.xml`. After changing a dependency or plugin version, regenerate both:
+```bash
+./gradlew --write-verification-metadata sha256 dependencies build jacocoTestReport sonarResolver --write-locks
+```
+Review the diff of both files before committing.
 
 ## Known limitations
 These are open points worth fixing, not intended behaviour:

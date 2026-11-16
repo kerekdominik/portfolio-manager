@@ -29,8 +29,10 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
+                // CSRF protection is not needed: the API is stateless, authenticates every request with a
+                // JWT in the Authorization header and uses no session or authentication cookies.
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors
                         .configurationSource(corsConfigurationSource())

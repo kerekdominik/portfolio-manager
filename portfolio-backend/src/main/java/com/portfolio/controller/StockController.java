@@ -7,6 +7,7 @@ import com.portfolio.entity.PortfolioAsset;
 import com.portfolio.entity.User;
 import com.portfolio.entity.asset.Stock;
 import com.portfolio.entity.asset.external.StockListItem;
+import com.portfolio.exception.ExternalApiException;
 import com.portfolio.repository.GroupRepository;
 import com.portfolio.repository.PortfolioAssetRepository;
 import com.portfolio.repository.PortfolioRepository;
@@ -22,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +37,18 @@ import java.util.Optional;
 @Tag(name = "StockController", description = "API for managing stocks in portfolios")
 public class StockController {
 
+    private static final String PORTFOLIO_NOT_FOUND = "Portfolio not found for user";
+    private static final String ERROR = "error";
+    private static final String MESSAGE = "message";
+    private static final String STOCK_NOT_FOUND = "Stock asset not found";
+
     private final PortfolioAssetRepository portfolioAssetRepository;
     private final GroupRepository groupRepository;
     private final StockListRepository stockListRepository;
     private final PortfolioRepository portfolioRepository;
     private final StockService stockService;
     private final ExternalStockService externalStockService;
+    private final Clock clock;
 
     @PostMapping
     @Operation(summary = "Add stock to portfolio", description = "Adds a new stock to the user's portfolio.")
@@ -48,11 +57,11 @@ public class StockController {
             @AuthenticationPrincipal User user) {
 
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         Optional<StockListItem> stockListItemOpt = stockListRepository.findBySymbol(stockRequest.getSymbol());
         if (stockListItemOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid stock symbol"));
+            return ResponseEntity.badRequest().body(Map.of(ERROR, "Invalid stock symbol"));
         }
 
         Stock stock = new Stock(
@@ -68,24 +77,17 @@ public class StockController {
         portfolioAsset.setPriceWhenBought(stockRequest.getPrice());
         portfolioAsset.setQuantity(stockRequest.getQuantity());
         portfolioAsset.setPurchaseDate(
-                stockRequest.getPurchaseDate() != null ? stockRequest.getPurchaseDate() : LocalDate.now()
+                stockRequest.getPurchaseDate() != null ? stockRequest.getPurchaseDate() : LocalDate.now(clock)
         );
 
-        try {
-            portfolioAsset.setCurrentPrice(
-                    externalStockService.getCurrentStockPriceInUSD(stockRequest.getSymbol())
-            );
-        } catch (Exception e) {
-            log.error("Error fetching current price for stock", e);
-            throw new RuntimeException(e);
-        }
+        portfolioAsset.setCurrentPrice(fetchCurrentPrice(stockRequest.getSymbol()));
 
         if (stockRequest.getGroupId() != null) {
             groupRepository.findById(stockRequest.getGroupId()).ifPresent(portfolioAsset::setGroup);
         }
 
         portfolioAssetRepository.save(portfolioAsset);
-        return ResponseEntity.ok(Map.of("message", "Stock added to portfolio successfully"));
+        return ResponseEntity.ok(Map.of(MESSAGE, "Stock added to portfolio successfully"));
     }
 
     @GetMapping
@@ -94,7 +96,7 @@ public class StockController {
             @AuthenticationPrincipal User user) {
 
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         List<PortfolioAsset> assets = portfolioAssetRepository.findByPortfolio(portfolio);
         List<StockResponseDto> stocks = assets.stream()
@@ -113,18 +115,18 @@ public class StockController {
             @AuthenticationPrincipal User user) {
 
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         Optional<PortfolioAsset> portfolioAssetOpt = portfolioAssetRepository.findByIdAndPortfolio(id, portfolio);
         if (portfolioAssetOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Stock asset not found"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(ERROR, STOCK_NOT_FOUND));
         }
 
         PortfolioAsset portfolioAsset = portfolioAssetOpt.get();
         portfolioAsset.setPriceWhenBought(stockRequest.getPrice());
         portfolioAsset.setQuantity(stockRequest.getQuantity());
         portfolioAsset.setPurchaseDate(
-                stockRequest.getPurchaseDate() != null ? stockRequest.getPurchaseDate() : LocalDate.now()
+                stockRequest.getPurchaseDate() != null ? stockRequest.getPurchaseDate() : LocalDate.now(clock)
         );
 
         if (stockRequest.getGroupId() != null) {
@@ -134,7 +136,7 @@ public class StockController {
         }
 
         portfolioAssetRepository.save(portfolioAsset);
-        return ResponseEntity.ok(Map.of("message", "Stock updated successfully"));
+        return ResponseEntity.ok(Map.of(MESSAGE, "Stock updated successfully"));
     }
 
     @DeleteMapping("/{id}")
@@ -144,15 +146,27 @@ public class StockController {
             @AuthenticationPrincipal User user) {
 
         Portfolio portfolio = portfolioRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found for user"));
+                .orElseThrow(() -> new RuntimeException(PORTFOLIO_NOT_FOUND));
 
         Optional<PortfolioAsset> portfolioAssetOpt = portfolioAssetRepository.findByIdAndPortfolio(id, portfolio);
         if (portfolioAssetOpt.isPresent()) {
             portfolioAssetRepository.delete(portfolioAssetOpt.get());
-            return ResponseEntity.ok(Map.of("message", "Stock deleted successfully"));
+            return ResponseEntity.ok(Map.of(MESSAGE, "Stock deleted successfully"));
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Stock asset not found"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(ERROR, STOCK_NOT_FOUND));
+    }
+
+    private double fetchCurrentPrice(String symbol) {
+        try {
+            return externalStockService.getCurrentStockPriceInUSD(symbol);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ExternalApiException("Interrupted while fetching current price for stock " + symbol, e);
+        } catch (IOException e) {
+            log.error("Error fetching current price for stock {}", symbol, e);
+            throw new ExternalApiException("Error fetching current price for stock " + symbol, e);
+        }
     }
 
     private StockResponseDto getStockResponseDto(PortfolioAsset stock) {

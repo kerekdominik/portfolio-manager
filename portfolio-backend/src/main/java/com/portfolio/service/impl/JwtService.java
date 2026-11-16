@@ -3,7 +3,6 @@ package com.portfolio.service.impl;
 import com.portfolio.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,18 +21,29 @@ import java.util.function.Function;
 @Slf4j
 @Service
 public class JwtService {
+
+    private static final Duration TOKEN_LIFETIME = Duration.ofHours(24);
+
     @Value("${jwt.secret.key}")
     private String secretKey;
 
+    private final Clock clock;
+
+    public JwtService(Clock clock) {
+        this.clock = clock;
+    }
+
     /** Token generation **/
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        Instant now = clock.instant();
+        // jjwt only accepts java.util.Date for these claims, so convert at the library boundary
         return Jwts
                 .builder()
-                .setClaims(extraClaims)
-                .setSubject(((User) userDetails).getEmail())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 *24))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+                .claims(extraClaims)
+                .subject(((User) userDetails).getEmail())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plus(TOKEN_LIFETIME)))
+                .signWith(getSigningKey(), Jwts.SIG.HS512)
                 .compact();
     }
 
@@ -51,13 +64,13 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractExpiration(token).isBefore(clock.instant());
     }
 
 
     /** Token extraction **/
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    private Instant extractExpiration(String token) {
+        return extractClaim(token, claims -> claims.getExpiration().toInstant());
     }
 
     public String extractEmail(String token) {
@@ -70,10 +83,9 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        SecretKey key = getSigningKey();
-
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(getSigningKey())
+                .clock(() -> Date.from(clock.instant()))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
