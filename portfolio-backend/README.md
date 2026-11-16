@@ -21,6 +21,7 @@ REST API of **portfolio-manager**, an application for tracking an investment por
 - [Code conventions](#code-conventions)
 - [Project structure](#project-structure)
 - [Dependencies](#dependencies)
+- [Database migrations](#database-migrations)
 - [Known limitations](#known-limitations)
 
 ---
@@ -88,7 +89,7 @@ Then open:
 ./gradlew jacocoTestReport # coverage report
 ```
 
-> **Heads up:** `spring.jpa.hibernate.ddl-auto` is `create-drop`, so the schema is created at startup and **all data is deleted when the application stops**. See [Known limitations](#known-limitations).
+> **Database:** the schema is managed by Flyway migrations (see [Database migrations](#database-migrations)), so data is kept across restarts. Start with an empty PostgreSQL database; the tables are created on the first start.
 
 ## Configuration
 
@@ -294,12 +295,26 @@ Dependency versions are pinned in `gradle.lockfile`, and every downloaded artifa
 ```
 Review the diff of both files before committing.
 
+## Database migrations
+The schema is owned by [Flyway](https://flywaydb.org/): SQL files in `src/main/resources/db/migration` are applied automatically at startup, and Hibernate runs with `ddl-auto=validate`, so the application refuses to start if the entities and the database disagree. Data is kept across restarts.
+
+- **Change the schema** by adding a new file, `V2__short_description.sql`, `V3__...`. **Never edit a migration that was already applied** anywhere, Flyway checks the checksums and will fail.
+- `V1__init.sql` is the baseline, generated from the entities. For a new entity or column, write the SQL by hand in the next migration (a Hibernate export, `jakarta.persistence.schema-generation.scripts.*`, is a good starting point).
+- `DatabaseMigrationTest` starts a real PostgreSQL with Testcontainers (skipped when Docker is not available), applies all migrations and lets Hibernate validate them. If you change an entity without a migration, this test fails.
+- Unit tests and the `test` profile use H2 with `ddl-auto=update` and Flyway switched off.
+
+**Backups.** The data lives only in the PostgreSQL volume, deleting that volume deletes everything. Dump and restore with:
+```bash
+pg_dump -U <user> -h <host> portfolio-manager > portfolio-manager.sql
+psql -U <user> -h <host> -d portfolio-manager < portfolio-manager.sql   # into an empty database
+```
+Keep `JWT_SECRET_KEY` stable as well, otherwise every issued token is invalid after a restart.
+
 ## Known limitations
 These are open points worth fixing, not intended behaviour:
 
-- **Data is wiped on restart.** `ddl-auto=create-drop` drops the schema when the app stops. Switch to `validate` or `update` plus a migration tool (Flyway or Liquibase) before keeping real data.
 - **Old Alpha Vantage API key is still in the git history.** The key is now read from `ALPHAVANTAGE_API_KEY`, but the previous hard-coded key can be found in old commits, so it must stay revoked at Alpha Vantage.
 - **Hard-coded localhost URLs.** The OAuth2 success redirect (`http://localhost:4200/...`), the CORS origin and the Swagger server URL are fixed in code, so a deployed instance needs them made configurable.
 - **JWT in a URL.** After Google sign-in the token is passed as a query parameter, which can end up in browser history and logs.
 - **Verbose logging.** `DEBUG` logging for Spring Security and Web, and `show-sql=true`, should be turned down outside development.
-- **No Docker setup or database migrations yet.** PostgreSQL has to be provided separately.
+- **No Docker setup yet.** PostgreSQL has to be provided separately.
