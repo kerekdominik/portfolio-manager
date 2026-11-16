@@ -1,0 +1,13 @@
+# keep the build context small and free of local files
+build/
+.gradle/
+.idea/
+.vscode/
+.run/
+.junie/
+out/
+bin/
+*.iml
+.env
+.env.*
+**/*.log

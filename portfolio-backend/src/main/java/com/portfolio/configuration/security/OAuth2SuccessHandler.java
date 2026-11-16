@@ -1,5 +1,6 @@
 package com.portfolio.configuration.security;
 
+import com.portfolio.configuration.AppProperties;
 import com.portfolio.dto.auth.AuthenticationResponseDto;
 import com.portfolio.service.impl.OAuth2Service;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.io.IOException;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final OAuth2Service oAuth2AuthService;
+    private final AppProperties appProperties;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -27,7 +29,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         AuthenticationResponseDto authResponse = oAuth2AuthService.authenticateWithOAuth2(email, firstName, lastName);
 
-        String redirectUrl = "http://localhost:4200/oauth2/redirect?token=" + authResponse.getToken();
+        String redirectUrl = appProperties.frontendUrl() + "/oauth2/redirect?token=" + authResponse.getToken();
         response.sendRedirect(redirectUrl);
     }
 }
