@@ -12,9 +12,9 @@ Full-stack portfolio tracker: `portfolio-backend` (Java 17, Spring Boot, Gradle)
 
 ## Security and configuration
 
-- Never hard-code secrets or API keys. Read them from environment variables. Do not touch the existing hard-coded Alpha Vantage key without asking, because it needs to be rotated.
+- Never hard-code secrets or API keys. Read them from environment variables. The old Alpha Vantage key is still in the git history and must stay revoked.
 - Do not add new hard-coded localhost URLs. Make them configurable properties.
-- Do not change `spring.jpa.hibernate.ddl-auto` or add DB migrations without asking first, because it affects data persistence.
+- The schema is managed by Flyway (`ddl-auto=validate`). Schema changes need a new `V<n>__*.sql` migration in `portfolio-backend/src/main/resources/db/migration`; never edit a migration that was already applied.
 
 ## Code conventions
 
