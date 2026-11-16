@@ -25,6 +25,7 @@ Full-stack portfolio tracker: `portfolio-backend` (Java 17, Spring Boot, Gradle)
 
 - Backend (from `portfolio-backend`): `./gradlew bootRun`, `./gradlew test`, `./gradlew build`
 - Frontend (from `portfolio-frontend`): `npm start`, `npm test`
+- Whole stack in containers (repo root): `docker compose up -d --build`, needs a `.env` (see `.env.example`); never `docker compose down -v` on real data
 
 ## References
 

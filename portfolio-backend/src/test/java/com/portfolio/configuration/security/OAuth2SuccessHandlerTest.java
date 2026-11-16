@@ -1,9 +1,11 @@
 package com.portfolio.configuration.security;
 
+import com.portfolio.configuration.AppProperties;
 import com.portfolio.dto.auth.AuthenticationResponseDto;
 import com.portfolio.service.impl.OAuth2Service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -21,7 +23,6 @@ class OAuth2SuccessHandlerTest {
     @Mock
     private OAuth2Service oAuth2AuthService;
 
-    @InjectMocks
     private OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Mock
@@ -35,6 +36,11 @@ class OAuth2SuccessHandlerTest {
 
     @Mock
     private OAuth2User oAuth2User;
+
+    @BeforeEach
+    void setUp() {
+        oAuth2SuccessHandler = new OAuth2SuccessHandler(oAuth2AuthService, new AppProperties(null, null));
+    }
 
     @Test
     void testOnAuthenticationSuccess() throws IOException {
@@ -58,5 +64,19 @@ class OAuth2SuccessHandlerTest {
         verify(response).sendRedirect(expectedRedirectUrl);
 
         verify(oAuth2AuthService).authenticateWithOAuth2("john.doe@example.com", "John", "Doe");
+    }
+
+    @Test
+    void testRedirectUsesConfiguredFrontendUrl() throws IOException {
+        oAuth2SuccessHandler = new OAuth2SuccessHandler(oAuth2AuthService,
+                new AppProperties("https://portfolio.example.com/", null));
+        when(authentication.getPrincipal()).thenReturn(oAuth2User);
+        when(oAuth2User.getAttribute("email")).thenReturn("john.doe@example.com");
+        when(oAuth2AuthService.authenticateWithOAuth2("john.doe@example.com", null, null))
+                .thenReturn(AuthenticationResponseDto.builder().token("t").build());
+
+        oAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
+
+        verify(response).sendRedirect("https://portfolio.example.com/oauth2/redirect?token=t");
     }
 }

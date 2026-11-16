@@ -22,6 +22,7 @@ REST API of **portfolio-manager**, an application for tracking an investment por
 - [Project structure](#project-structure)
 - [Dependencies](#dependencies)
 - [Database migrations](#database-migrations)
+- [Running in containers](#running-in-containers)
 - [Known limitations](#known-limitations)
 
 ---
@@ -103,6 +104,8 @@ Settings live in [`application.properties`](src/main/resources/application.prope
 | `GOOGLE_CLIENT_ID` | Google OAuth2 client id | |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret | |
 | `ALPHAVANTAGE_API_KEY` | Alpha Vantage API key | Optional. If it is not set, the stock list import is skipped (with a warning) and stock price lookups fail with a clear error. Crypto works without it. |
+| `APP_FRONTEND_URL` | Public URL of the web app (`app.frontend-url`) | Optional, default `http://localhost:4200`. Where the browser is sent after a Google sign-in. |
+| `APP_CORS_ALLOWED_ORIGINS` | Allowed CORS origins, comma separated | Optional, default `http://localhost:4200`. Not needed when the frontend and the API share one origin (nginx proxy in the containers). |
 
 Fixed settings:
 
@@ -110,7 +113,9 @@ Fixed settings:
 |---|---|
 | Database URL | `jdbc:postgresql://localhost:5432/portfolio-manager` |
 | Server port | `8080` (Spring Boot default) |
-| CORS allowed origin | `http://localhost:4200` (methods GET, POST, PUT, DELETE, OPTIONS) |
+| CORS allowed origin | `app.cors.allowed-origins`, default `http://localhost:4200` (methods GET, POST, PUT, DELETE, OPTIONS) |
+| Frontend URL after Google sign-in | `app.frontend-url`, default `http://localhost:4200` |
+| Health endpoint | `GET /actuator/health` (public, status only; nothing else of actuator is exposed) |
 | JWT lifetime | 24 hours |
 | Cache | Caffeine, entries expire 3 minutes after write, max 100 entries |
 | Log level | `DEBUG` for `org.springframework.security` and `org.springframework.web` |
@@ -177,7 +182,7 @@ sequenceDiagram
     B->>A: GET /api/auth/oauth2/authorize
     A->>G: redirect to Google
     G-->>A: callback (/login/oauth2/...)
-    A-->>B: redirect to http://localhost:4200/oauth2/redirect?token=JWT
+    A-->>B: redirect to {app.frontend-url}/oauth2/redirect?token=JWT
 ```
 
 - Sessions are stateless (`SessionCreationPolicy.STATELESS`), CSRF protection is disabled because there are no cookies, and `JwtAuthFilter` validates the token on each request.
@@ -310,11 +315,24 @@ psql -U <user> -h <host> -d portfolio-manager < portfolio-manager.sql   # into a
 ```
 Keep `JWT_SECRET_KEY` stable as well, otherwise every issued token is invalid after a restart.
 
+## Running in containers
+The repository root has a `compose.yaml` that runs the whole app: **nginx** (serves the Angular app and forwards `/api` to the backend, the only published port), the **backend** and **PostgreSQL** with a named volume for the data. The backend and the database are reachable inside the compose network only.
+
+```bash
+cp .env.example .env        # fill in DB_PASSWORD and JWT_SECRET_KEY (openssl rand -base64 64)
+docker compose up -d --build
+```
+Then open <http://localhost:8082> (`FRONTEND_PORT` in `.env`). Notes:
+- `docker compose down` keeps the data, **`docker compose down -v` deletes the database volume**.
+- Email and password login works out of the box. Google sign-in needs a real OAuth client and a redirect URI Google accepts (`localhost` or a public domain); until then the Google values stay placeholders.
+- The backend image is built from `portfolio-backend/Dockerfile` (JDK build stage, JRE runtime, non-root user). The Gradle lock and verification files are copied into the build stage, so keep them committed. The container healthcheck uses `/actuator/health`.
+- Without `ALPHAVANTAGE_API_KEY` the stock list import is skipped.
+- Swagger UI and `/actuator/health` are not published through nginx (the healthcheck runs inside the network). To look at the API docs, run the backend locally or use `docker compose exec backend wget -qO- http://127.0.0.1:8080/v3/api-docs`.
+- Local development without containers is unchanged: `./gradlew bootRun` and `ng serve`, which proxies `/api` to `localhost:8080` (`proxy.conf.json`).
+
 ## Known limitations
 These are open points worth fixing, not intended behaviour:
 
 - **Old Alpha Vantage API key is still in the git history.** The key is now read from `ALPHAVANTAGE_API_KEY`, but the previous hard-coded key can be found in old commits, so it must stay revoked at Alpha Vantage.
-- **Hard-coded localhost URLs.** The OAuth2 success redirect (`http://localhost:4200/...`), the CORS origin and the Swagger server URL are fixed in code, so a deployed instance needs them made configurable.
 - **JWT in a URL.** After Google sign-in the token is passed as a query parameter, which can end up in browser history and logs.
 - **Verbose logging.** `DEBUG` logging for Spring Security and Web, and `show-sql=true`, should be turned down outside development.
-- **No Docker setup yet.** PostgreSQL has to be provided separately.

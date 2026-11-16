@@ -47,6 +47,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-cache")
 	implementation("org.springframework.boot:spring-boot-starter-flyway")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 
 	/** Imported and managed manually **/
 	implementation(libs.springdoc.openapi.starter.webmvc.ui)
@@ -76,6 +77,15 @@ dependencies {
 
 }
 
+
+/** Packaging: one executable jar with a fixed name, so the Dockerfile does not depend on the version **/
+tasks.jar {
+	enabled = false // no "-plain.jar" next to the boot jar
+}
+
+tasks.bootJar {
+	archiveFileName.set("app.jar")
+}
 
 /** Coverage and test report **/
 tasks.withType<Test> {

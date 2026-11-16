@@ -1,0 +1,63 @@
+# Portfolio manager: nginx (Angular app + /api proxy) -> Spring Boot backend -> PostgreSQL.
+#
+#   cp .env.example .env     # then fill in the values
+#   docker compose up -d --build     # build the images here
+#   docker compose pull && docker compose up -d     # or use the published images (ghcr.io)
+#
+# Only the frontend port is published. The backend and the database are reachable inside the compose network only.
+name: portfolio-manager
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: portfolio-manager
+      POSTGRES_USER: ${DB_USERNAME:?set DB_USERNAME in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      # The application data lives here. "docker compose down -v" deletes it.
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ghcr.io/kerekdominik/portfolio-manager-backend:${IMAGE_TAG:-latest}
+    build: ./portfolio-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/portfolio-manager
+      DB_USERNAME: ${DB_USERNAME:?set DB_USERNAME in .env}
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      # at least 64 bytes, base64 (openssl rand -base64 64); keep it stable or issued tokens stop working
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in .env}
+      # Google sign-in is not enabled; the app only needs these values to start
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-not-configured}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-not-configured}
+      # optional: without a key the stock list import is skipped
+      ALPHAVANTAGE_API_KEY: ${ALPHAVANTAGE_API_KEY:-}
+      # public address of the app, used after an OAuth2 login
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:8082}
+      # quieter logs than the development defaults
+      SPRING_JPA_SHOW_SQL: "false"
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: INFO
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: INFO
+
+  frontend:
+    image: ghcr.io/kerekdominik/portfolio-manager-frontend:${IMAGE_TAG:-latest}
+    build: ./portfolio-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8082}:8080"
+
+volumes:
+  postgres_data:

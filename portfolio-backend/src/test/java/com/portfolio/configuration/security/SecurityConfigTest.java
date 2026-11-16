@@ -1,5 +1,6 @@
 package com.portfolio.configuration.security;
 
+import com.portfolio.configuration.AppProperties;
 import com.portfolio.controller.DashboardController;
 import com.portfolio.entity.Portfolio;
 import com.portfolio.entity.User;
@@ -11,6 +12,7 @@ import com.portfolio.service.impl.PortfolioValueService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.security.oauth2.client.autoconfigure.servlet.OAuth2ClientWebSecurityAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
@@ -67,6 +69,7 @@ class SecurityConfigTest {
     private PortfolioRepository portfolioRepository;
 
     @TestConfiguration
+    @EnableConfigurationProperties(AppProperties.class)
     static class OAuth2TestConfig {
         @Bean
         ClientRegistrationRepository clientRegistrationRepository() {
@@ -113,6 +116,19 @@ class SecurityConfigTest {
                         .header("Access-Control-Request-Method", "GET"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:4200"));
+    }
+
+    @Test
+    void actuatorHealth_isPublic() throws Exception {
+        // The actuator endpoint itself is not part of this MVC slice, so 404 shows security let the request through
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void otherActuatorEndpoints_requireAuthentication() throws Exception {
+        mockMvc.perform(get("/actuator/env"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
