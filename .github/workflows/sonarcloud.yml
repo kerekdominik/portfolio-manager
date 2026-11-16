@@ -1,43 +1,51 @@
-name: SonarCloud
+name: SonarCloud - backend
+
 on:
   push:
     branches:
       - main
+    paths:
+      - 'portfolio-backend/**'
+      - '.github/workflows/sonarcloud.yml'
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'portfolio-backend/**'
+      - '.github/workflows/sonarcloud.yml'
   workflow_dispatch:
+
 jobs:
-  build:
-    name: Build and analyze
+  backend:
+    name: Backend analysis
     runs-on: ubuntu-latest
     env:
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'zulu' # Alternative distribution options are available
+          distribution: 'zulu'
+          cache: gradle
+          cache-dependency-path: |
+            portfolio-backend/**/*.gradle*
+            portfolio-backend/gradle/wrapper/gradle-wrapper.properties
+            portfolio-backend/gradle/libs.versions.toml
+
       - name: Cache SonarCloud packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('portfolio-backend/**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-      - name: Set executable permissions for gradlew
-        run: chmod +x portfolio-backend/gradlew
-      - name: Build and analyze
+
+      - name: Build, test and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        working-directory: portfolio-backend  # Set the working directory
-        run: ./gradlew build jacocoTestReport sonarqube --info
+        working-directory: portfolio-backend
+        run: ./gradlew build jacocoTestReport sonar
