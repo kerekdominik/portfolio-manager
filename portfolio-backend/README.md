@@ -69,6 +69,7 @@ export DB_PASSWORD=...
 export JWT_SECRET_KEY=...            # at least 64 bytes, see below
 export GOOGLE_CLIENT_ID=...
 export GOOGLE_CLIENT_SECRET=...
+export ALPHAVANTAGE_API_KEY=...      # optional, free key from alphavantage.co; without it stock data is skipped
 
 # 2. start the API on http://localhost:8080
 ./gradlew bootRun
@@ -100,6 +101,7 @@ Settings live in [`application.properties`](src/main/resources/application.prope
 | `JWT_SECRET_KEY` | Signing JWTs | At least 64 bytes for HS512. Also set as a secret in CI. |
 | `GOOGLE_CLIENT_ID` | Google OAuth2 client id | |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret | |
+| `ALPHAVANTAGE_API_KEY` | Alpha Vantage API key | Optional. If it is not set, the stock list import is skipped (with a warning) and stock price lookups fail with a clear error. Crypto works without it. |
 
 Fixed settings:
 
@@ -296,7 +298,7 @@ Review the diff of both files before committing.
 These are open points worth fixing, not intended behaviour:
 
 - **Data is wiped on restart.** `ddl-auto=create-drop` drops the schema when the app stops. Switch to `validate` or `update` plus a migration tool (Flyway or Liquibase) before keeping real data.
-- **Alpha Vantage API key is hard-coded** in `ExternalStockServiceImpl`. Move it to an environment variable and rotate it, since it is in the git history.
+- **Old Alpha Vantage API key is still in the git history.** The key is now read from `ALPHAVANTAGE_API_KEY`, but the previous hard-coded key can be found in old commits, so it must stay revoked at Alpha Vantage.
 - **Hard-coded localhost URLs.** The OAuth2 success redirect (`http://localhost:4200/...`), the CORS origin and the Swagger server URL are fixed in code, so a deployed instance needs them made configurable.
 - **JWT in a URL.** After Google sign-in the token is passed as a query parameter, which can end up in browser history and logs.
 - **Verbose logging.** `DEBUG` logging for Spring Security and Web, and `show-sql=true`, should be turned down outside development.
