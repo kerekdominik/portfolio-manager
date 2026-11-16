@@ -6,6 +6,7 @@ import com.portfolio.repository.StockListItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -22,6 +23,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ExternalStockServiceImplTest {
 
+    private static final String TEST_KEY = "test-key";
+
     @Mock
     private StockListItemRepository stockListItemRepository;
 
@@ -35,7 +38,7 @@ class ExternalStockServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new ExternalStockServiceImpl(stockListItemRepository, httpClient);
+        service = new ExternalStockServiceImpl(stockListItemRepository, httpClient, TEST_KEY);
     }
 
     private void givenResponse(int status, String body) throws Exception {
@@ -44,6 +47,12 @@ class ExternalStockServiceImplTest {
         if (status == 200) {
             when(httpResponse.body()).thenReturn(body);
         }
+    }
+
+    private String sentUrl() throws Exception {
+        ArgumentCaptor<HttpRequest> request = ArgumentCaptor.forClass(HttpRequest.class);
+        verify(httpClient).send(request.capture(), any());
+        return request.getValue().uri().toString();
     }
 
     @Test
@@ -60,15 +69,27 @@ class ExternalStockServiceImplTest {
         when(stockListItemRepository.saveAll(expected)).thenReturn(expected);
 
         assertEquals(expected, service.fetchAllStocks());
+        assertEquals("https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=test-key", sentUrl());
     }
 
     @Test
-    void fetchAllStocks_errorStatus_throws() throws Exception {
+    void fetchAllStocks_errorStatus_throwsWithoutLeakingKey() throws Exception {
         givenResponse(503, null);
 
         IOException exception = assertThrows(IOException.class, () -> service.fetchAllStocks());
         assertEquals("Alpha Vantage request failed with HTTP status 503", exception.getMessage());
+        assertFalse(exception.getMessage().contains(TEST_KEY));
         verifyNoInteractions(stockListItemRepository);
+    }
+
+    @Test
+    void fetchAllStocks_withoutApiKey_skipsImport() throws Exception {
+        for (String missing : new String[]{null, "", "   "}) {
+            ExternalStockServiceImpl withoutKey = new ExternalStockServiceImpl(stockListItemRepository, httpClient, missing);
+
+            assertTrue(withoutKey.fetchAllStocks().isEmpty());
+        }
+        verifyNoInteractions(httpClient, stockListItemRepository);
     }
 
     @Test
@@ -76,6 +97,16 @@ class ExternalStockServiceImplTest {
         givenResponse(200, "{\"Global Quote\":{\"01. symbol\":\"AAPL\",\"05. price\":\"189.9800\"}}");
 
         assertEquals(189.98, service.getCurrentStockPriceInUSD("AAPL"));
+        assertEquals("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=test-key", sentUrl());
+    }
+
+    @Test
+    void getCurrentStockPriceInUSD_encodesSymbol() throws Exception {
+        givenResponse(200, "{\"Global Quote\":{\"05. price\":\"10.0\"}}");
+
+        service.getCurrentStockPriceInUSD("BRK.B&x=1");
+
+        assertEquals("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=BRK.B%26x%3D1&apikey=test-key", sentUrl());
     }
 
     @Test
@@ -88,7 +119,17 @@ class ExternalStockServiceImplTest {
     }
 
     @Test
+    void getCurrentStockPriceInUSD_withoutApiKey_throwsClearError() {
+        ExternalStockServiceImpl withoutKey = new ExternalStockServiceImpl(stockListItemRepository, httpClient, "");
+
+        ExternalApiException exception = assertThrows(ExternalApiException.class,
+                () -> withoutKey.getCurrentStockPriceInUSD("AAPL"));
+        assertTrue(exception.getMessage().contains("ALPHAVANTAGE_API_KEY"));
+        verifyNoInteractions(httpClient);
+    }
+
+    @Test
     void springConstructor_createsDefaultHttpClient() {
-        assertNotNull(new ExternalStockServiceImpl(stockListItemRepository));
+        assertNotNull(new ExternalStockServiceImpl(stockListItemRepository, TEST_KEY));
     }
 }
