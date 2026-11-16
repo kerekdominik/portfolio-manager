@@ -1,43 +1,44 @@
-name: Build - frontend
+name: SonarCloud - frontend
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'portfolio-frontend/**'
+      - '.github/workflows/sonarcloud-frontend.yml'
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'portfolio-frontend/**'
+      - '.github/workflows/sonarcloud-frontend.yml'
   workflow_dispatch:
 
 jobs:
-  sonarcloud:
-    name: SonarCloud - frontend
+  frontend:
+    name: Frontend analysis
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: portfolio-frontend/package-lock.json
 
-      # Change to the frontend subdirectory for all following commands
-      - name: Set working directory
-        run: cd portfolio-frontend
-        
       - name: Install dependencies
-        run: npm install
+        run: npm ci
         working-directory: portfolio-frontend
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+      # Project key, organization, sources and exclusions live in portfolio-frontend/sonar-project.properties
+      - name: SonarCloud scan
+        uses: SonarSource/sonarqube-scan-action@v5
         with:
-          args: >
-            -Dsonar.projectKey=portfolio-frontend
-            -Dsonar.organization=kerekdominik
-            -Dsonar.exclusions=portfolio-backend/**,**/node_modules/**,**/*.java
+          projectBaseDir: portfolio-frontend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
