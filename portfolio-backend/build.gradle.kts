@@ -57,6 +57,7 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("com.h2database:h2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -71,7 +72,7 @@ tasks.withType<Test> {
 }
 
 jacoco {
-	toolVersion = "0.8.7"
+	toolVersion = "0.8.14"
 }
 
 tasks.jacocoTestReport {
