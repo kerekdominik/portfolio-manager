@@ -18,6 +18,7 @@ REST API of **portfolio-manager**, an application for tracking an investment por
 - [Data model](#data-model)
 - [External data sources](#external-data-sources)
 - [Testing and quality](#testing-and-quality)
+- [Code conventions](#code-conventions)
 - [Project structure](#project-structure)
 - [Known limitations](#known-limitations)
 
@@ -214,7 +215,52 @@ erDiagram
 - JUnit 5, Mockito and Spring Security Test. Tests use an in-memory **H2** database configured in `src/test/resources/application-test.properties`.
 - Coverage is measured with JaCoCo. Reports are written to `build/reports/jacoco/test/html/index.html` and as XML for Sonar.
 - CI ([`.github/workflows`](../.github/workflows)) runs `./gradlew build jacocoTestReport sonarqube` on every push to `main` and on pull requests, publishing results to [SonarCloud](https://sonarcloud.io) (project `kerekdominik_portfolio-manager`). It needs the repository secrets `SONAR_TOKEN` and `JWT_SECRET_KEY`.
-- More developer notes: [`.junie/guidelines.md`](.junie/guidelines.md).
+
+### Running tests
+```bash
+./gradlew test                                                   # all tests
+./gradlew test --tests "com.portfolio.entity.UserTest"           # one class
+./gradlew test --tests "com.portfolio.entity.UserTest.testBuilder"  # one method
+```
+On Windows use `gradlew.bat`. Coverage reports are written to `build/reports/jacoco/test/html/index.html` (HTML) and `build/reports/jacoco/test/jacocoTestReport.xml` (XML).
+
+### Adding new tests
+1. Create the test class under `src/test/java`, in the same package as the class under test.
+2. Use JUnit 5 (Jupiter) and follow the existing patterns:
+   - `@BeforeEach` for setup, test methods named `test...` plus the behaviour, Arrange-Act-Assert structure.
+   - **Entity tests:** constructors, getters/setters, `equals`/`hashCode`, `toString`.
+   - **Service tests:** mock dependencies with Mockito.
+   - **Controller tests:** `@ExtendWith(SpringExtension.class)` and mocked services.
+
+Example entity test:
+```java
+class CryptoListItemTest {
+
+    private CryptoListItem cryptoListItem;
+
+    @BeforeEach
+    void setUp() {
+        cryptoListItem = new CryptoListItem();
+    }
+
+    @Test
+    void testSettersAndGetters() {
+        cryptoListItem.setId("ethereum");
+        cryptoListItem.setSymbol("eth");
+        cryptoListItem.setName("Ethereum");
+
+        assertEquals("ethereum", cryptoListItem.getId());
+        assertEquals("eth", cryptoListItem.getSymbol());
+        assertEquals("Ethereum", cryptoListItem.getName());
+    }
+}
+```
+
+## Code conventions
+- Lombok removes boilerplate. Entities carry JPA annotations, DTOs cross the layer boundaries, MapStruct converts between them.
+- Services that need to be mocked or swapped are implemented behind interfaces.
+- Where to look: caching in `CacheConfig`, OpenAPI in `OpenApiConfig`, security in `SecurityConfig`, `JwtAuthFilter` and `OAuth2SuccessHandler`.
+- Debugging: `DEBUG` logging for Spring Security and Web is on by default, tune it in `application.properties`.
 
 ## Project structure
 
