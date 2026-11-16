@@ -17,10 +17,18 @@ public record AppProperties(String frontendUrl, Cors cors) {
     public static final String DEFAULT_FRONTEND_URL = "http://localhost:4200";
 
     public AppProperties {
-        frontendUrl = (frontendUrl == null || frontendUrl.isBlank())
-                ? DEFAULT_FRONTEND_URL
-                : frontendUrl.strip().replaceAll("/+$", "");
+        String cleaned = frontendUrl == null ? "" : withoutTrailingSlashes(frontendUrl.strip());
+        frontendUrl = cleaned.isEmpty() ? DEFAULT_FRONTEND_URL : cleaned;
         cors = cors == null ? new Cors(null) : cors;
+    }
+
+    // plain loop instead of a regex such as "/+$", which can backtrack badly on long inputs
+    private static String withoutTrailingSlashes(String url) {
+        int end = url.length();
+        while (end > 0 && url.charAt(end - 1) == '/') {
+            end--;
+        }
+        return url.substring(0, end);
     }
 
     /**

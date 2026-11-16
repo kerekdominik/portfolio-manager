@@ -39,6 +39,18 @@ class AppPropertiesTest {
     }
 
     @Test
+    void frontendUrlMadeOnlyOfSlashesFallsBackToDefault() {
+        assertEquals("http://localhost:4200", new AppProperties("///", null).frontendUrl());
+    }
+
+    @Test
+    void veryLongRunOfSlashesIsHandledQuickly() {
+        String url = "https://portfolio.example.com" + "/".repeat(200_000);
+
+        assertEquals("https://portfolio.example.com", new AppProperties(url, null).frontendUrl());
+    }
+
+    @Test
     void bindsValuesFromConfiguration() {
         contextRunner
                 .withPropertyValues(
