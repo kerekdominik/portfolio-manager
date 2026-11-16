@@ -214,7 +214,7 @@ erDiagram
 ## Testing and quality
 - JUnit 5, Mockito and Spring Security Test. Tests use an in-memory **H2** database configured in `src/test/resources/application-test.properties`.
 - Coverage is measured with JaCoCo. Reports are written to `build/reports/jacoco/test/html/index.html` and as XML for Sonar.
-- CI ([`.github/workflows`](../.github/workflows)) runs `./gradlew build jacocoTestReport sonarqube` on every push to `main` and on pull requests, publishing results to [SonarCloud](https://sonarcloud.io) (project `kerekdominik_portfolio-manager`). It needs the repository secrets `SONAR_TOKEN` and `JWT_SECRET_KEY`.
+- CI ([`.github/workflows`](../.github/workflows)) runs `./gradlew build jacocoTestReport sonar` for backend changes on every push to `main` and on pull requests (the frontend has its own workflow and SonarCloud project, `portfolio-manager-frontend`), publishing results to [SonarCloud](https://sonarcloud.io) (project `portfolio-manager-backend`). It needs the repository secrets `SONAR_TOKEN` and `JWT_SECRET_KEY`.
 
 ### Running tests
 ```bash
