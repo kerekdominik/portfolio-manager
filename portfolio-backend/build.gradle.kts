@@ -12,6 +12,7 @@ version = "1.0.0"
 sonar {
 	properties {
 		property("sonar.projectKey", "portfolio-manager-backend")
+		property("sonar.projectName", "portfolio-manager-backend")
 		property("sonar.organization", "kerekdominik")
 		property("sonar.host.url", "https://sonarcloud.io")
 		property("sonar.java.coveragePlugin", "jacoco")
