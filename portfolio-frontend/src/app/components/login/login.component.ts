@@ -33,9 +33,8 @@ export class LoginComponent {
   onSubmit() {
     this.authService.login(this.email, this.password)
       .subscribe({
-        next: (response) => {
-          console.log('Login successful', response);
-          this.router.navigate(['/dashboard']).then(r => console.log(r));
+        next: () => {
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           if (error.status === 401) {
@@ -50,7 +49,7 @@ export class LoginComponent {
   }
 
   navigateToRegister() {
-    this.router.navigate(['/register']).then(r => console.log(r));
+    this.router.navigate(['/register']);
   }
 
   onGoogleLogin() {
