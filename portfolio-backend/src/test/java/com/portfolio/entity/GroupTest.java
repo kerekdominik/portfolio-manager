@@ -2,13 +2,15 @@ package com.portfolio.entity;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class GroupTest {
@@ -20,8 +22,8 @@ class GroupTest {
     @BeforeEach
     void setUp() {
         group = new Group();
-        mockPortfolioAsset = Mockito.mock(PortfolioAsset.class);
-        mockUser = Mockito.mock(User.class);
+        mockPortfolioAsset = mock(PortfolioAsset.class);
+        mockUser = mock(User.class);
     }
 
     @Test
@@ -76,11 +78,11 @@ class GroupTest {
     @Test
     void testRemoveAsset() {
         group.setAssets(new ArrayList<>(List.of(mockPortfolioAsset)));
-        Mockito.doNothing().when(mockPortfolioAsset).setGroup(null);
+        doNothing().when(mockPortfolioAsset).setGroup(null);
 
         group.removeAsset(mockPortfolioAsset);
 
         assertEquals(0, group.getAssets().size());
-        Mockito.verify(mockPortfolioAsset).setGroup(null); // Verify that group is set to null
+        verify(mockPortfolioAsset).setGroup(null); // Verify that group is set to null
     }
 }

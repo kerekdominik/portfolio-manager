@@ -34,6 +34,11 @@ repositories {
 	mavenCentral()
 }
 
+/** Pin every resolved dependency version in gradle.lockfile (update with: ./gradlew dependencies --write-locks) **/
+dependencyLocking {
+	lockAllConfigurations()
+}
+
 dependencies {
 	platform(libs.spring.boot.bom)
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")

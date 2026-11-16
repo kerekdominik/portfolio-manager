@@ -21,6 +21,8 @@ import java.util.Map;
 @Tag(name = "ExternalCryptoController", description = "API for external cryptocurrency data")
 public class ExternalCryptoController {
 
+    private static final String ERROR = "error";
+
     private final ExternalCryptoService externalCryptoService;
     private final CryptoListRepository cryptoListRepository;
 
@@ -59,14 +61,14 @@ public class ExternalCryptoController {
 
             return price != null
                     ? ResponseEntity.ok(response)
-                    : ResponseEntity.status(404).body(Map.of("error", "Price not found for cryptocurrency: " + id));
+                    : ResponseEntity.status(404).body(Map.of(ERROR, "Price not found for cryptocurrency: " + id));
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(Map.of("error", "Error fetching price: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of(ERROR, "Error fetching price: " + e.getMessage()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ResponseEntity.status(500).body(Map.of("error", "Request interrupted: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of(ERROR, "Request interrupted: " + e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(Map.of("error", "Invalid cryptocurrency id: " + e.getMessage()));
+            return ResponseEntity.status(400).body(Map.of(ERROR, "Invalid cryptocurrency id: " + e.getMessage()));
         }
     }
 
@@ -87,14 +89,14 @@ public class ExternalCryptoController {
 
             return price != null
                     ? ResponseEntity.ok(response)
-                    : ResponseEntity.status(404).body(Map.of("error", "Historical price not found for cryptocurrency: " + id + " on date: " + date));
+                    : ResponseEntity.status(404).body(Map.of(ERROR, "Historical price not found for cryptocurrency: " + id + " on date: " + date));
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(Map.of("error", "Error fetching historical price: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of(ERROR, "Error fetching historical price: " + e.getMessage()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ResponseEntity.status(500).body(Map.of("error", "Request interrupted: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of(ERROR, "Request interrupted: " + e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(Map.of("error", "Invalid date format or other issue: " + e.getMessage()));
+            return ResponseEntity.status(400).body(Map.of(ERROR, "Invalid date format or other issue: " + e.getMessage()));
         }
     }
 }

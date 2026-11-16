@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/groups")
 @Tag(name = "GroupController", description = "API for managing user-defined groups")
 public class GroupController {
+
+    private static final String MESSAGE = "message";
 
     private final GroupRepository groupRepository;
 
@@ -35,7 +36,7 @@ public class GroupController {
         groupRepository.save(newGroup);
 
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Group created successfully");
+        response.put(MESSAGE, "Group created successfully");
         return ResponseEntity.ok(response);
     }
 
@@ -48,7 +49,7 @@ public class GroupController {
         List<Group> groups = groupRepository.findByUser(user);
         List<GroupResponseDto> groupDtos = groups.stream()
                 .map(group -> new GroupResponseDto(group.getId(), group.getName()))
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(groupDtos);
     }
 
@@ -63,7 +64,7 @@ public class GroupController {
                     existingGroup.setName(groupDto.getName());
                     groupRepository.save(existingGroup);
                     Map<String, String> response = new HashMap<>();
-                    response.put("message", "Group updated successfully");
+                    response.put(MESSAGE, "Group updated successfully");
                     return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -79,7 +80,7 @@ public class GroupController {
                 .map(group -> {
                     groupRepository.delete(group);
                     Map<String, String> response = new HashMap<>();
-                    response.put("message", "Group deleted successfully");
+                    response.put(MESSAGE, "Group deleted successfully");
                     return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.notFound().build());

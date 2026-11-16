@@ -1,19 +1,17 @@
 package com.portfolio.entity;
 
 import com.portfolio.entity.asset.Stock;
+import com.portfolio.entity.enums.AssetCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class StockTest {
-    private Portfolio mockPortfolio;
     private Stock stock;
 
     @BeforeEach
     void setUp() {
-        mockPortfolio = Mockito.mock(Portfolio.class);
         stock = new Stock();
     }
 
@@ -31,5 +29,15 @@ class StockTest {
         assertEquals(1L, stock.getId(), "ID should be 1");
         assertEquals("AAPL", stock.getSymbol(), "Symbol should be AAPL");
         assertEquals("Apple Inc.", stock.getName(), "Name should be Apple Inc.");
+    }
+
+    @Test
+    void testConstructorSetsFieldsAndCategory() {
+        Stock aapl = new Stock("AAPL", "Apple Inc.", "NASDAQ");
+
+        assertEquals("AAPL", aapl.getSymbol());
+        assertEquals("Apple Inc.", aapl.getName());
+        assertEquals("NASDAQ", aapl.getExchange());
+        assertEquals(AssetCategory.STOCK, aapl.getAssetCategory());
     }
 }
